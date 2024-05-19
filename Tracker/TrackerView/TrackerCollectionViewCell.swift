@@ -1,14 +1,15 @@
 import Foundation
 import UIKit
 
+
 protocol TrackerCollectionViewCellDelegate: AnyObject {
     func changeCompletedTrackers(_ cell: TrackerCollectionViewCell)
 }
 
-//класс ячеек в коллекции
 class TrackerCollectionViewCell: UICollectionViewCell {
-    weak var delegate: TrackerCollectionViewCellDelegate?
     
+    // MARK: - Public Properties
+    weak var delegate: TrackerCollectionViewCellDelegate?
     let image = UIImageView()
     let titleLabel = UILabel()
     let countLabel = UILabel()
@@ -16,6 +17,7 @@ class TrackerCollectionViewCell: UICollectionViewCell {
     let backgroundEmojiImage = UIImageView()
     let emojiImage = UIImageView()
     
+    // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -41,12 +43,14 @@ class TrackerCollectionViewCell: UICollectionViewCell {
         countLabel.textColor = UIColor.ypBlack
         countLabel.font = UIFont.systemFont(ofSize: 12)
         button.addTarget(self,
-                               action: #selector(onClick),
-                               for: .touchUpInside)
+                         action: #selector(onClick),
+                         for: .touchUpInside)
+        button.layer.cornerRadius = 16
+        button.layer.masksToBounds = true
         backgroundEmojiImage.layer.cornerRadius = 12
         backgroundEmojiImage.layer.masksToBounds = true
         backgroundEmojiImage.backgroundColor = UIColor.ypLightGray.withAlphaComponent(0.3) //.withAlphaComponent(0.3) чтобы цвет был прозрачным
-
+        
         NSLayoutConstraint.activate([
             image.topAnchor.constraint(equalTo: topAnchor),
             image.leftAnchor.constraint(equalTo: leftAnchor),
@@ -72,9 +76,10 @@ class TrackerCollectionViewCell: UICollectionViewCell {
             emojiImage.centerYAnchor.constraint(equalTo: backgroundEmojiImage.centerYAnchor),
             emojiImage.widthAnchor.constraint(equalToConstant: 16),
             emojiImage.heightAnchor.constraint(equalToConstant: 16),
-         ])
+        ])
     }
     
+    // MARK: - IB Actions
     @objc func onClick() { //при нажатии на кнопку "+"
         delegate?.changeCompletedTrackers(self)
     }
