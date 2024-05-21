@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class NewHabitCategoryViewController: UIViewController {
+final class NewCategoryViewController: UIViewController {
     
     // MARK: - Overrides Methods
     override func viewDidLoad() {

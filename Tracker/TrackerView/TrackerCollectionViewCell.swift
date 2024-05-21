@@ -6,7 +6,7 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
     func changeCompletedTrackers(_ cell: TrackerCollectionViewCell)
 }
 
-class TrackerCollectionViewCell: UICollectionViewCell {
+final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Public Properties
     weak var delegate: TrackerCollectionViewCellDelegate?

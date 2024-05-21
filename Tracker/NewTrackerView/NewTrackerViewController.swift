@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 protocol NewTrackerViewControllerDelegate: AnyObject {
-    func updateCategory(newCategory: TrackerCategory)
+    func addCategory(newCategory: TrackerCategory)
 }
 
 final class NewTrackerViewController: UIViewController {
@@ -31,7 +31,11 @@ final class NewTrackerViewController: UIViewController {
     }
     
     @objc private func onClickEventButton(_ sender: UIButton) {
-        
+        let viewController = NewEventViewController()
+        viewController.delegate = self
+        let navigationController = UINavigationController(rootViewController: viewController)
+        navigationController.viewControllers.first?.navigationItem.title = "Новое нерегулярное событие"
+        self.navigationController?.present(navigationController, animated: true)
     }
     
     // MARK: - Private Methods
@@ -67,8 +71,8 @@ final class NewTrackerViewController: UIViewController {
 }
 
 // MARK: - NewHabitViewControllerDelegate
-extension NewTrackerViewController: NewHabitViewControllerDelegate {
-    func updateCategory(newCategory: TrackerCategory) {
-        delegate?.updateCategory(newCategory: newCategory)
+extension NewTrackerViewController: NewHabitViewControllerDelegate, NewEventViewControllerDelegate {
+    func addCategory(newCategory: TrackerCategory) {
+        delegate?.addCategory(newCategory: newCategory)
     }
 }

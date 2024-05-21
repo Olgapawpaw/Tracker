@@ -2,19 +2,22 @@ import Foundation
 import UIKit
 
 
-class NewHabitViewCell: UITableViewCell {
+final class NewHabitShedulerTableViewCell: UITableViewCell {
     
     // MARK: - Public Properties
     let buttonLabel = UILabel()
+    let switchView = UISwitch(frame: .zero)
     
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: .default, reuseIdentifier: "cell")
-        self.backgroundColor = UIColor.ypLightGray
+        self.backgroundColor = UIColor.ypLightGray.withAlphaComponent(0.3)
         contentView.addSubview(buttonLabel)
         buttonLabel.font = UIFont.systemFont(ofSize: 17)
         buttonLabel.translatesAutoresizingMaskIntoConstraints = false
-        self.accessoryType = .disclosureIndicator
+        switchView.setOn(false, animated: true)
+        switchView.onTintColor = UIColor.ypBlue
+        self.accessoryView = switchView
         self.selectionStyle = .none
         NSLayoutConstraint.activate([
             buttonLabel.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
@@ -28,4 +31,3 @@ class NewHabitViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 }
-

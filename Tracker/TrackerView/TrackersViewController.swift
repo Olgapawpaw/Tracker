@@ -4,62 +4,18 @@ import UIKit
 
 final class TrackersViewController: UIViewController {
     
+    // MARK: - Public Properties
+    var categories = [TrackerCategory]()
+    var selectedCategories = [TrackerCategory]()
+    
     // MARK: - Private Properties
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let scrollView = UIScrollView()
-    private let noTrackersImage = UIImageView(image: UIImage(named: "MainViewError"))
+    private let noTrackersImage = UIImageView()
     private let noTrackersLabel = UILabel()
     private var selectedDate = Date()
-    private var selectedCategories = [TrackerCategory]()
+    private var weekDay = Int()
     private var completedTrackers = [TrackerRecord]()
-    private var categories = [TrackerCategory(name: "Домашний уют",
-                                      trackers: [Tracker(id: UUID(),
-                                                         name: "Поливать растения",
-                                                         color: UIColor.colorSelection1,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.tuesday,
-                                                                    WeekDay.saturday])
-                                      ]),
-                      TrackerCategory(name: "Радостные мелочи",
-                                      trackers: [Tracker(id: UUID(),
-                                                         name: "Кошка заслонила камеру на созвоне",
-                                                         color: UIColor.colorSelection2,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.monday,
-                                                                    WeekDay.friday]),
-                                                 Tracker(id: UUID(),
-                                                         name: "Бабушка прислала открытку",
-                                                         color: UIColor.colorSelection1,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.monday,
-                                                                    WeekDay.friday,
-                                                                    WeekDay.tuesday])
-                                      ]
-                                     ),
-                      TrackerCategory(name: "Мелочи",
-                                      trackers: [Tracker(id: UUID(),
-                                                         name: "Кошка заслонила камеру на созвоне",
-                                                         color: UIColor.colorSelection3,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.monday,
-                                                                    WeekDay.friday]),
-                                                 Tracker(id: UUID(),
-                                                         name: "Бабушка прислала открытку",
-                                                         color: UIColor.colorSelection1,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.monday,
-                                                                    WeekDay.friday,
-                                                                    WeekDay.tuesday]),
-                                                 Tracker(id: UUID(),
-                                                         name: "Бабушка прислала открытку",
-                                                         color: UIColor.colorSelection2,
-                                                         emoji: UIImage(named: "emoji_1"),
-                                                         sheduler: [WeekDay.monday,
-                                                                    WeekDay.friday,
-                                                                    WeekDay.tuesday])
-                                      ]
-                                     )
-    ]
     
     // MARK: - Overrides Methods
     override func viewDidLoad() {
@@ -68,22 +24,57 @@ final class TrackersViewController: UIViewController {
         setupScrollView()
         createCollection()
         updateSelectedCategories(selectedDate: getNowDate(), weekday: getNowWeekday())
+        customReloadData()
     }
     
     // MARK: - Public Methods
-    func updateCategory(newCategory: TrackerCategory) {
-        var count = 0
-        for i in categories {
-            if i.name.contains(newCategory.name) {
-                categories[count].trackers.append(contentsOf: newCategory.trackers)
-                break
-            } else {
+    func getNowDate() -> Date {
+        let date = NSDate()
+        let calendar = Calendar.current
+        let dateComponents = calendar.dateComponents([.day, .month, .year], from: date as Date)
+        let dateWithoutTime = calendar.date(from: dateComponents)!
+        return dateWithoutTime
+    }
+    
+    func getNowWeekday() -> Int {
+        let time = NSDate()
+        let calendar = Calendar.current
+        let weekday = calendar.component(.weekday, from: time as Date)
+        return weekday
+    }
+    
+    func addCategory(newCategory: TrackerCategory) {
+        var isAddCategory = Bool()
+        if categories.isEmpty == false {
+            for (count, i) in categories.enumerated() {
+                if i.name.contains(newCategory.name) {
+                    categories[count].trackers.append(contentsOf: newCategory.trackers)
+                    isAddCategory = true
+                    break
+                }
+            }
+            if isAddCategory == false {
                 categories.append(newCategory)
             }
-            count += 1
+        } else {
+            categories.append(newCategory)
         }
-        updateSelectedCategories(selectedDate: getNowDate(), weekday: getNowWeekday())
+        updateSelectedCategories(selectedDate: selectedDate, weekday: weekDay)
         customReloadData()
+    }
+    
+    func customReloadData() {
+        if categories.isEmpty == true {
+            setupNoTracker(title: "Что будем отслеживать?", imageName: "MainViewError")
+        } else {
+            if selectedCategories.isEmpty {
+                collectionView.reloadData()
+                setupNoTracker(title: "Ничего не найдено", imageName: "NoTrackerAfterFiltering")
+            } else {
+                hideNoTracker()
+                collectionView.reloadData()
+            }
+        }
     }
     
     func updateSelectedCategories(selectedDate: Date, weekday: Int) {
@@ -101,16 +92,26 @@ final class TrackersViewController: UIViewController {
             }
         }
         self.selectedDate = selectedDate
+        self.weekDay = weekday
         customReloadData()
     }
     
     // MARK: - Private Methods
     private func showNoTracker() {
+        setupNoTracker(title: "Что будем отслеживать?", imageName: "MainViewError")
+    }
+    
+    private func showNoTrackerAfterFiltering() {
+        setupNoTracker(title: "Ничего не найдено", imageName: "NoTrackerAfterFiltering")
+    }
+    
+    private func setupNoTracker(title: String, imageName: String) {
         view.addSubview(noTrackersImage)
         view.addSubview(noTrackersLabel)
         noTrackersImage.translatesAutoresizingMaskIntoConstraints = false
         noTrackersLabel.translatesAutoresizingMaskIntoConstraints = false
-        noTrackersLabel.text = "Что будем отслеживать?"
+        noTrackersImage.image = UIImage(named: imageName)
+        noTrackersLabel.text = title
         noTrackersLabel.textColor = UIColor.ypBlack
         noTrackersLabel.font = UIFont.systemFont(ofSize: 12)
         NSLayoutConstraint.activate([
@@ -153,31 +154,6 @@ final class TrackersViewController: UIViewController {
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
         ])
     }
-    
-    private func customReloadData() {
-        if selectedCategories.isEmpty {
-            collectionView.reloadData()
-            showNoTracker()
-        } else {
-            hideNoTracker()
-            collectionView.reloadData()
-        }
-    }
-    
-    private func getNowDate() -> Date {
-        let date = NSDate()
-        let calendar = Calendar.current
-        let dateComponents = calendar.dateComponents([.day, .month, .year], from: date as Date)
-        let dateWithoutTime = calendar.date(from: dateComponents)!
-        return dateWithoutTime
-    }
-    
-    private func getNowWeekday() -> Int {
-        let time = NSDate()
-        let calendar = Calendar.current
-        let weekday = calendar.component(.weekday, from: time as Date)
-        return weekday
-    }
 }
 
 
@@ -193,24 +169,35 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {     //ячейка для заданной позиции IndexPath
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as? TrackerCollectionViewCell // экземпляр ячейки
-        cell?.delegate = self
-        cell?.countLabel.text = "\(completedTrackers.filter{ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id}.count) дней"
-        cell?.titleLabel.text = selectedCategories[indexPath.section].trackers[indexPath.item].name //название трекера
-        cell?.image.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color // цвет карточки
-        cell?.emojiImage.image = selectedCategories[indexPath.section].trackers[indexPath.item].emoji // эмодзи
-        //задание кнопки в зависимости от нажатия
-        if completedTrackers.filter({ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id && $0.date == selectedDate}) .isEmpty {
-            cell?.button.setImage(UIImage(named:"AddDay")?.withRenderingMode(.alwaysTemplate), for: .normal) // .withRenderingMode(.alwaysTemplate) для возможности изменения цвета картинки
-            cell?.button.backgroundColor = UIColor.white.withAlphaComponent(1.0)
-            cell?.button.tintColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(1.0)
-        } else {
-            cell?.button.setImage(UIImage(named:"DoneDay")?.withRenderingMode(.alwaysTemplate), for: .normal)
-            cell?.button.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(0.3)
-            cell?.button.tintColor = UIColor.white
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath)
+        
+        guard let cell = cell as? TrackerCollectionViewCell else {
+            return TrackerCollectionViewCell()
         }
         
-        return cell!
+        cell.delegate = self
+        switch completedTrackers.filter({ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id}).count{
+        case 1:
+            cell.countLabel.text = "\(completedTrackers.filter{ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id}.count) день"
+        case 2, 3, 4:
+            cell.countLabel.text = "\(completedTrackers.filter{ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id}.count) дня"
+        default:
+            cell.countLabel.text = "\(completedTrackers.filter{ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id}.count) дней"
+        }
+        cell.titleLabel.text = selectedCategories[indexPath.section].trackers[indexPath.item].name //название трекера
+        cell.image.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color // цвет карточки
+        cell.emojiImage.image = selectedCategories[indexPath.section].trackers[indexPath.item].emoji // эмодзи
+        //задание кнопки в зависимости от нажатия
+        if completedTrackers.filter({ $0.id == selectedCategories[indexPath.section].trackers[indexPath.item].id && $0.date == selectedDate}) .isEmpty {
+            cell.button.setImage(UIImage(named:"AddDay")?.withRenderingMode(.alwaysTemplate), for: .normal) // .withRenderingMode(.alwaysTemplate) для возможности изменения цвета картинки
+            cell.button.backgroundColor = UIColor.white.withAlphaComponent(1.0)
+            cell.button.tintColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(1.0)
+        } else {
+            cell.button.setImage(UIImage(named:"DoneDay")?.withRenderingMode(.alwaysTemplate), for: .normal)
+            cell.button.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(0.3)
+            cell.button.tintColor = UIColor.white
+        }
+        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {     //для задания хедера
@@ -238,12 +225,11 @@ extension TrackersViewController: UICollectionViewDelegateFlowLayout {
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, referenceSizeForHeaderInSection section: Int) -> CGSize { //расположение и размер хедера
-        let indexPath = IndexPath(row: 0, section: section)
-        let headerView = self.collectionView(collectionView, viewForSupplementaryElementOfKind: UICollectionView.elementKindSectionHeader, at: indexPath)
-        return headerView.systemLayoutSizeFitting(CGSize(width: collectionView.frame.width,
-                                                         height: UIView.layoutFittingExpandedSize.height),
-                                                  withHorizontalFittingPriority: .required,
-                                                  verticalFittingPriority: .fittingSizeLevel)
+        return CGSize(width: collectionView.frame.width, height: 36)
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
+        return UIEdgeInsets(top: 12, left: 0, bottom: 0, right: 0)
     }
 }
 

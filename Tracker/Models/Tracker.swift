@@ -11,10 +11,16 @@ enum WeekDay: Int, CaseIterable {
     case sunday = 1
 }
 
+enum Type: String, CaseIterable {
+    case event = "event"
+    case habit = "habit"
+}
+
 struct Tracker {
     let id: UUID
     let name: String
     let color: UIColor
     let emoji: UIImage?
     let sheduler: [WeekDay]
+    let type: Type
 }

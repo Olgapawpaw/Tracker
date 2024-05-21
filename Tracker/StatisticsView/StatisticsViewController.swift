@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-class StatisticsViewController: UIViewController {
+final class StatisticsViewController: UIViewController {
     
     // MARK: - Overrides Methods
     override func viewDidLoad() {

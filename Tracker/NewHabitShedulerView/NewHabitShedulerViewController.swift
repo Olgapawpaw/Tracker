@@ -4,21 +4,22 @@ import UIKit
 
 protocol NewHabitShedulerViewControllerDelegate: AnyObject {
     func updateSheduler(sheduler: [WeekDay])
+    func updateTable()
 }
 
-class NewHabitShedulerViewController: UIViewController {
+final class NewHabitShedulerViewController: UIViewController {
     
     // MARK: - Public Properties
     weak var delegate: NewHabitShedulerViewControllerDelegate?
+    var sheduler = [WeekDay]()
     
     // MARK: - Private Properties
-    private var sheduler = [WeekDay]()
     private let weekDayForView = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
     private let weekDay = [WeekDay.monday, WeekDay.tuesday, WeekDay.wednesday, WeekDay.thursday, WeekDay.friday, WeekDay.saturday, WeekDay.sunday]
     private let readyButton = UIButton()
     private lazy var tableView: UITableView = {
         let table = UITableView()
-        table.register(NewHabitShedulerViewCell.self, forCellReuseIdentifier: "cell")
+        table.register(NewHabitShedulerTableViewCell.self, forCellReuseIdentifier: "cell")
         table.translatesAutoresizingMaskIntoConstraints = false
         table.delegate = self
         table.dataSource = self
@@ -36,6 +37,7 @@ class NewHabitShedulerViewController: UIViewController {
     // MARK: - IB Actions
     @objc private func onClickReadyButton() {
         delegate?.updateSheduler(sheduler: sheduler)
+        delegate?.updateTable()
         self.dismiss(animated: true)
     }
     
@@ -48,7 +50,7 @@ class NewHabitShedulerViewController: UIViewController {
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 24),
             tableView.heightAnchor.constraint(equalToConstant: 525),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 16),
-            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -16)
         ])
     }
     
@@ -76,7 +78,11 @@ class NewHabitShedulerViewController: UIViewController {
 extension NewHabitShedulerViewController: UITableViewDelegate, UITableViewDataSource{
     
     @objc func switchChanged(_ sender : UISwitch!){
-        sheduler.append(weekDay[sender.tag])
+        if sheduler.contains(weekDay[sender.tag]) {
+            sheduler.remove(at: sheduler.firstIndex(of: weekDay[sender.tag]) ?? 0)
+        } else {
+            sheduler.append(weekDay[sender.tag])
+        }
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -84,13 +90,22 @@ extension NewHabitShedulerViewController: UITableViewDelegate, UITableViewDataSo
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? NewHabitShedulerViewCell
-        cell?.buttonLabel.text = weekDayForView[indexPath.item]
-        cell?.switchView.tag = indexPath.row
-        cell?.switchView.addTarget(self,
-                                   action: #selector(self.switchChanged(_:)),
-                                   for: .valueChanged)
-        return cell!
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        guard let cell = cell as? NewHabitShedulerTableViewCell else {
+            return NewHabitShedulerTableViewCell()
+        }
+        cell.buttonLabel.text = weekDayForView[indexPath.item]
+        cell.switchView.tag = indexPath.row
+        cell.switchView.addTarget(self,
+                                  action: #selector(self.switchChanged(_:)),
+                                  for: .valueChanged)
+        if sheduler.contains(weekDay[indexPath.item]) {
+            cell.switchView.isOn = true
+        }
+        if indexPath.item == weekDayForView.count - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        }
+        return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
