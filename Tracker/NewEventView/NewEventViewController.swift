@@ -160,13 +160,13 @@ final class NewEventViewController: UIViewController {
     private func setupButton() {
         changeButton(tittle: "Создать",
                      colorTitle: UIColor.white,
-                     colorBackround: UIColor.ypLightGray,
+                     colorBackround: UIColor.ypGray,
                      borderWidth: 0,
                      button: createButton)
         changeButton(tittle: "Отменить",
                      colorTitle: UIColor.ypRed,
                      colorBackround: UIColor.white,
-                     borderWidth: 2,
+                     borderWidth: 1,
                      button: cancelButton)
         cancelButton.addTarget(self,
                                action: #selector(onClickCancelButton),
