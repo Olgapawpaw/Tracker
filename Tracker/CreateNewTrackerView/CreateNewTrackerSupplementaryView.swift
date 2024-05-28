@@ -1,7 +1,7 @@
 import Foundation
 import UIKit
 
-final class NewHabitSupplementaryView: UICollectionReusableView {
+final class CreateNewTrackerSupplementaryView: UICollectionReusableView {
     // MARK: - Public Properties
     let titleLabel = UILabel()
     
@@ -13,9 +13,8 @@ final class NewHabitSupplementaryView: UICollectionReusableView {
         titleLabel.textColor = UIColor.ypBlack
         titleLabel.font = UIFont.boldSystemFont(ofSize: 19)
         NSLayoutConstraint.activate([
-            titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
-            titleLabel.topAnchor.constraint(equalTo: topAnchor),
-            titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -12),
+            titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
+            titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
     }
     

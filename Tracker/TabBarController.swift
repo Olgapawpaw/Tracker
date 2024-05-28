@@ -18,6 +18,7 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     private let createNewTrackerViewController = NewTrackerViewController()
     private var weekday = Int()
     private var selectedDate = Date()
+    private var helpers = Helpers()
     
     
     // MARK: - Overrides Methods
@@ -25,8 +26,8 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
         super.viewDidLoad()
         generateTabBar()
         addBorderForTabBar(color: UIColor.ypLightGray, thickness: 1.00)
-        weekday = trackerViewController.getNowWeekday()
-        selectedDate = trackerViewController.getNowDate()
+        weekday = helpers.getNowWeekday()
+        selectedDate = helpers.getNowDate()
     }
     
     // MARK: - IB Actions
@@ -135,8 +136,8 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
 
 // MARK: - NewTrackerViewControllerDelegate
 extension TabBarController: NewTrackerViewControllerDelegate {
-    func addCategory(newCategory: TrackerCategory) {
-        trackerViewController.addCategory(newCategory: newCategory)
+    func addCategory(newCategory: TrackerCategory, newTracker: Tracker) {
+        trackerViewController.addCategory(newCategory: newCategory, newTracker: newTracker)
     }
 }
 
@@ -144,34 +145,7 @@ extension TabBarController: NewTrackerViewControllerDelegate {
 extension TabBarController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
         if searchIsEmpty == false {
-            var categories = [TrackerCategory]()
-            var selectedCategories = [TrackerCategory]()
-            var trackers = [Tracker]()
-            
-            for i in trackerViewController.categories {
-                for j in i.trackers {
-                    if j.name.lowercased().contains(searchController.searchBar.text!.lowercased()) {
-                        trackers.append(j)
-                    }
-                }
-                categories.append(TrackerCategory(name: i.name, trackers: trackers))
-                trackers.removeAll()
-            }
-            
-            for i in categories {
-                for j in i.trackers {
-                    if j.sheduler.filter({ $0.rawValue == weekday}).isEmpty == false  {
-                        trackers.append(j)
-                    }
-                }
-                if trackers.isEmpty == false {
-                    selectedCategories.append(TrackerCategory(name: i.name, trackers: trackers))
-                    trackers.removeAll()
-                }
-            }
-            
-            trackerViewController.selectedCategories = selectedCategories
-            trackerViewController.customReloadData()
+            trackerViewController.updateSearchSelectedCategories(text: searchController.searchBar.text!.lowercased())
         } else {
             trackerViewController.updateSelectedCategories(selectedDate: selectedDate, weekday: weekday)
         }

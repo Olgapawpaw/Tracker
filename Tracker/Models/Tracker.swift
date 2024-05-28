@@ -1,7 +1,8 @@
 import Foundation
 import UIKit
 
-enum WeekDay: Int, CaseIterable {
+
+enum WeekDay: Int, CaseIterable, Encodable, Decodable {
     case monday = 2
     case tuesday = 3
     case wednesday = 4
@@ -11,16 +12,10 @@ enum WeekDay: Int, CaseIterable {
     case sunday = 1
 }
 
-enum Type: String, CaseIterable {
-    case event = "event"
-    case habit = "habit"
-}
-
 struct Tracker {
     let id: UUID
     let name: String
     let color: UIColor
-    let emoji: UIImage?
+    let emoji: String
     let sheduler: [WeekDay]
-    let type: Type
 }
