@@ -14,7 +14,6 @@ final class TrackerCategoryStore: NSObject {
     
     // MARK: - Private Properties
     private var fetchedResultsController: NSFetchedResultsController<TrackerCategoryCoreData>!
-    private let marshalling = Marshalling()
     private let context: NSManagedObjectContext
     
     // MARK: - Overrides Methods
@@ -48,35 +47,35 @@ final class TrackerCategoryStore: NSObject {
         //потом надо будете через запрос к бд сделать
         var nameCategory = [String]()
         var trackerCategory = [TrackerCategory]()
-        var tracker = [Tracker]()
+        var trackers = [Tracker]()
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
         request.returnsObjectsAsFaults = false
         let trackerCategoryCoreData = try! context.fetch(request)
         
-        for i in trackerCategoryCoreData {
-            if nameCategory.contains(where: {$0 == i.name}) == false {
-                nameCategory.append(i.name ?? "")
+        for category in trackerCategoryCoreData {
+            if !nameCategory.contains(where: {$0 == category.name}) {
+                nameCategory.append(category.name ?? "Без названия")
             }
         }
         
-        for i in nameCategory {
-            for j in trackerCategoryCoreData {
-                if i == j.name {
-                    for k in trackerCoreData {
-                        if k.id == j.id {
-                            tracker.append(Tracker(id: k.id!,
-                                                   name: k.name!,
-                                                   color: marshalling.stringToColor(from: k.color!),
-                                                   emoji: k.emoji!,
-                                                   sheduler: marshalling.stringToWeekDay(from: k.sheduler!)))
+        for name in nameCategory {
+            for category in trackerCategoryCoreData {
+                if name == category.name {
+                    for tracker in trackerCoreData {
+                        if tracker.id == category.id {
+                            trackers.append(Tracker(id: tracker.id ?? UUID(),
+                                                    name: tracker.name ?? "" ,
+                                                    color: MarshallingColor.stringToColor(from: tracker.color ?? ""),
+                                                    emoji: tracker.emoji ?? "",
+                                                    sheduler: MarshallingWeekDay.stringToWeekDay(from: tracker.sheduler ?? "")))
                             break
                         }
                     }
                 }
             }
-            if tracker.count > 0 {
-                trackerCategory.append(TrackerCategory(name: i, trackers: tracker))
-                tracker.removeAll()
+            if trackers.count > 0 {
+                trackerCategory.append(TrackerCategory(name: name, trackers: trackers))
+                trackers.removeAll()
             }
         }
         return trackerCategory

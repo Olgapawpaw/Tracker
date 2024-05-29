@@ -144,7 +144,7 @@ extension TabBarController: NewTrackerViewControllerDelegate {
 // MARK: - UISearchResultsUpdating
 extension TabBarController: UISearchResultsUpdating {
     func updateSearchResults(for searchController: UISearchController) {
-        if searchIsEmpty == false {
+        if !searchIsEmpty {
             trackerViewController.updateSearchSelectedCategories(text: searchController.searchBar.text!.lowercased())
         } else {
             trackerViewController.updateSelectedCategories(selectedDate: selectedDate, weekday: weekday)

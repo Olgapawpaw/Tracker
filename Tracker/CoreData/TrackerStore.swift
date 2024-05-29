@@ -6,7 +6,6 @@ import CoreData
 final class TrackerStore: NSObject {
     // MARK: - Private Properties
     private let context: NSManagedObjectContext
-    private let marshalling = Marshalling()
     private var weekDay = [1: "sunday", 2: "monday", 3: "tuesday", 4: "wednesday", 5: "thursday", 6: "friday", 7: "saturday"]
     
     // MARK: - Overrides Methods
@@ -57,9 +56,9 @@ final class TrackerStore: NSObject {
         trackerCoreData.category = trackerCategoryCoreData
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
-        trackerCoreData.color = marshalling.colorToString(from: tracker.color)
+        trackerCoreData.color = MarshallingColor.colorToString(from: tracker.color)
         trackerCoreData.emoji = tracker.emoji
-        trackerCoreData.sheduler = marshalling.weekDayToString(from: tracker.sheduler)
+        trackerCoreData.sheduler = MarshallingWeekDay.weekDayToString(from: tracker.sheduler)
         try context.save()
     }
 }

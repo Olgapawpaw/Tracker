@@ -230,13 +230,13 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
         }
         switch indexPath.item {
         case 0:
-            if categoryName.isEmpty == true {
+            if categoryName.isEmpty {
                 cell.titleLabel.text = namesCell[indexPath.item]
             } else {
                 cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: categoryName)
             }
         case 1:
-            if sheduler.isEmpty == true {
+            if sheduler.isEmpty {
                 cell.titleLabel.text = namesCell[indexPath.item]
             } else {
                 switch sheduler {

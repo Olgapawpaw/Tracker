@@ -147,7 +147,7 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         cell.image.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color // цвет карточки
         cell.emoji.text = selectedCategories[indexPath.section].trackers[indexPath.item].emoji // эмодзи
         //задание кнопки в зависимости от нажатия
-        if istTrackerRecord == false {
+        if !istTrackerRecord {
             cell.button.setImage(UIImage(named:"AddDay")?.withRenderingMode(.alwaysTemplate), for: .normal) // .withRenderingMode(.alwaysTemplate) для возможности изменения цвета картинки
             cell.button.backgroundColor = UIColor.white.withAlphaComponent(1.0)
             cell.button.tintColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(1.0)
@@ -203,7 +203,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
         let isTrackerRecord = trackerRecordStore.checkExistTrackerRecord(tracker)
         
         if selectedDate <= nowDate {
-            if isTrackerRecord == false {
+            if !isTrackerRecord {
                 try! trackerRecordStore.addNewTrackerRecord(tracker)
             } else {
                 try! trackerRecordStore.deleteTrackerRecord(tracker)
@@ -216,7 +216,7 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 // MARK: - TrackerCategoryStoreDelegate
 extension TrackersViewController: TrackerCategoryStoreDelegate {
     func didUpdate() {
-        if isNoTracker == true {
+        if isNoTracker {
             setupNoTracker(title: "Что будем отслеживать?", imageName: "MainViewError")
         } else {
             if selectedCategories.isEmpty {

@@ -219,7 +219,7 @@ extension NewEventViewController: UITableViewDelegate, UITableViewDataSource{
         guard let cell = cell as? CreateNewTrackerTableViewCell else {
             return CreateNewTrackerTableViewCell()
         }
-        if categoryName.isEmpty == true {
+        if categoryName.isEmpty {
             cell.titleLabel.text = namesCell[indexPath.item]
         } else {
             cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: categoryName)
