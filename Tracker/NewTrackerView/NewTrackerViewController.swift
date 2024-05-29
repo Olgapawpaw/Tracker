@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 protocol NewTrackerViewControllerDelegate: AnyObject {
-    func addCategory(newCategory: TrackerCategory)
+    func addCategory(newCategory: TrackerCategory, newTracker: Tracker)
 }
 
 final class NewTrackerViewController: UIViewController {
@@ -72,7 +72,7 @@ final class NewTrackerViewController: UIViewController {
 
 // MARK: - NewHabitViewControllerDelegate
 extension NewTrackerViewController: NewHabitViewControllerDelegate, NewEventViewControllerDelegate {
-    func addCategory(newCategory: TrackerCategory) {
-        delegate?.addCategory(newCategory: newCategory)
+    func addCategory(newCategory: TrackerCategory, newTracker: Tracker) {
+        delegate?.addCategory(newCategory: newCategory, newTracker: newTracker)
     }
 }

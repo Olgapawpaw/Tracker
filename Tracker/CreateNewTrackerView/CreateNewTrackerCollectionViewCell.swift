@@ -1,8 +1,8 @@
 import Foundation
 import UIKit
 
-final class NewHabitCollectionViewCell: UICollectionViewCell {
-    
+final class CreateNewTrackerCollectionViewCell: UICollectionViewCell {
+    //NewHabitCollectionViewCell
     // MARK: - Public Properties
     let label = UILabel()
     
@@ -12,13 +12,14 @@ final class NewHabitCollectionViewCell: UICollectionViewCell {
         contentView.addSubview(label)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.font = UIFont.systemFont(ofSize: 32)
+        label.textAlignment = .center
+        label.layer.cornerRadius = 8
+        label.layer.masksToBounds = true
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topAnchor, constant: 7),
-            label.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
-            label.rightAnchor.constraint(equalTo: rightAnchor, constant: -10),
-            label.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -7),
-            label.widthAnchor.constraint(equalToConstant: 32),
-            label.heightAnchor.constraint(equalToConstant: 38)
+            label.centerXAnchor.constraint(equalTo: centerXAnchor),
+            label.centerYAnchor.constraint(equalTo: centerYAnchor),
+            label.widthAnchor.constraint(equalToConstant: 40),
+            label.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
     

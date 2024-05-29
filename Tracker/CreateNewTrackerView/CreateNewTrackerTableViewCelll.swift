@@ -2,7 +2,7 @@ import Foundation
 import UIKit
 
 
-final class NewHabitTableViewCell: UITableViewCell {
+final class CreateNewTrackerTableViewCell: UITableViewCell {
     
     // MARK: - Public Properties
     let titleLabel = UILabel()
