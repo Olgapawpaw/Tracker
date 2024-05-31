@@ -29,7 +29,7 @@ final class NewHabitViewController: UIViewController {
     }()
     private var selectedColor = UIColor()
     private var selectedEmoji = String()
-    private var categoryName = "Домашний уют"
+    private var selectedCategory = String()
     private var sheduler = [WeekDay]()
     private var tracker = [Tracker]()
     private let namesCell = ["Категория", "Расписание"]
@@ -88,7 +88,7 @@ final class NewHabitViewController: UIViewController {
                                  color: selectedColor,
                                  emoji: selectedEmoji,
                                  sheduler: sheduler)
-        let newCategory = TrackerCategory(name: categoryName, trackers: [newTracker])
+        let newCategory = TrackerCategory(name: selectedCategory, trackers: [newTracker])
         delegate?.addCategory(newCategory: newCategory, newTracker: newTracker)
         self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
     }
@@ -230,10 +230,10 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
         }
         switch indexPath.item {
         case 0:
-            if categoryName.isEmpty {
+            if selectedCategory.isEmpty {
                 cell.titleLabel.text = namesCell[indexPath.item]
             } else {
-                cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: categoryName)
+                cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: selectedCategory)
             }
         case 1:
             if sheduler.isEmpty {
@@ -261,6 +261,11 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.item == 0 {
             let viewController = NewCategoryViewController()
+            let newCategoryModel = NewCategoryModel()
+            newCategoryModel.delegate = self
+            newCategoryModel.selectedCategory = selectedCategory
+            let newCategoryViewModel = NewCategoryViewModel(for: newCategoryModel)
+            viewController.initialize(viewModel: newCategoryViewModel)
             let navigationController = UINavigationController(rootViewController: viewController)
             navigationController.viewControllers.first?.navigationItem.title = namesCell[indexPath.item]
             self.navigationController?.present(navigationController, animated: true)
@@ -297,14 +302,18 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
     }
 }
 
-// MARK: - NewHabitShedulerViewControllerDelegate
-extension NewHabitViewController: NewHabitShedulerViewControllerDelegate {
+// MARK: - NewHabitShedulerViewControllerDelegate, NewCategoryModelDelegate
+extension NewHabitViewController: NewHabitShedulerViewControllerDelegate, NewCategoryModelDelegate {
     func updateSheduler(sheduler: [WeekDay]) {
         self.sheduler = sheduler
     }
     
     func updateTable() {
         tableView.reloadData()
+    }
+    
+    func updateSelectedCategory(selectedCategory: String) {
+        self.selectedCategory = selectedCategory
     }
 }
 

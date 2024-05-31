@@ -81,6 +81,38 @@ final class TrackerCategoryStore: NSObject {
         return trackerCategory
     }
     
+    func getCategoryList() -> [String] {
+        var nameCategory = [String]()
+        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+        request.returnsObjectsAsFaults = false
+        let trackerCategoryCoreData = try! context.fetch(request)
+        
+        for category in trackerCategoryCoreData {
+            if !nameCategory.contains(where: {$0 == category.name}) {
+                nameCategory.append(category.name ?? "Без названия")
+            }
+        }
+        
+        return nameCategory
+    }
+    
+    func isEmptyCategory() -> Bool {
+        let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
+        request.resultType = .countResultType
+        let result = try! context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+        if result.finalResult?[0] as! Int > 0 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func addNewTrackerCategory(_ name: String) throws {
+        let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
+        trackerCategoryCoreData.name = name
+        try context.save()
+    }
+    
     func deleteTrackerCategory(_ trackerCategory: TrackerCategoryForCoreData) throws {
         let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackerCategoryCoreData")
         deleteFetch.predicate = NSPredicate(format: "name == %@ AND id == %@", trackerCategory.name as CVarArg, trackerCategory.id as CVarArg)
