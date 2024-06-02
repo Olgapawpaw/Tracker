@@ -3,11 +3,12 @@ import UIKit
 
 
 final class TrackersViewController: UIViewController {
-    
     // MARK: - Public Properties
     var selectedCategories = [TrackerCategory]()
     
     // MARK: - Private Properties
+    private let emptyTrekers = NSLocalizedString("emptyTrekers", comment: "Text displayed if no trakers")
+    private let noSelectedTrakers = NSLocalizedString("noSelectedTrakers", comment: "Text displayed if no trakers before filtered")
     private let collectionView = UICollectionView(frame: .zero, collectionViewLayout: UICollectionViewFlowLayout())
     private let scrollView = UIScrollView()
     private let noTrackersImage = UIImageView()
@@ -23,7 +24,7 @@ final class TrackersViewController: UIViewController {
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.viewBackgroundColor
         setupScrollView()
         createCollection()
         updateSelectedCategories(selectedDate: helpers.getNowDate(), weekday: helpers.getNowWeekday())
@@ -37,14 +38,22 @@ final class TrackersViewController: UIViewController {
     }
     
     func updateSearchSelectedCategories(text: String) {
-        let trackerCoreData = try! trackerStore.getSearchTrackers(text: text, day: weekDay)
-        selectedCategories = trackerCategoryStore.getTrackerCategory(trackerCoreData: trackerCoreData)
+        do {
+            let trackerCoreData = try trackerStore.getSearchTrackers(text: text, day: weekDay)
+            selectedCategories = trackerCategoryStore.getTrackerCategory(trackerCoreData: trackerCoreData)
+        } catch let error as NSError {
+            print(error.userInfo)
+        }
         didUpdate()
     }
     
     func updateSelectedCategories(selectedDate: Date, weekday: Int) {
-        let trackerCoreData = try! trackerStore.getSelectedTrackers(day: weekday)
-        selectedCategories = trackerCategoryStore.getTrackerCategory(trackerCoreData: trackerCoreData)
+        do {
+            let trackerCoreData = try trackerStore.getSelectedTrackers(day: weekday)
+            selectedCategories = trackerCategoryStore.getTrackerCategory(trackerCoreData: trackerCoreData)
+        } catch let error as NSError {
+            print(error.userInfo)
+        }
         isNoTracker = trackerStore.checkExistTrackers()
         self.selectedDate = selectedDate
         self.weekDay = weekday
@@ -53,18 +62,19 @@ final class TrackersViewController: UIViewController {
     
     // MARK: - Private Methods
     private func showNoTracker() {
-        setupNoTracker(title: "Что будем отслеживать?", imageName: "MainViewError")
+        setupNoTracker(title: emptyTrekers, imageName: "MainViewError")
     }
     
     private func showNoTrackerAfterFiltering() {
-        setupNoTracker(title: "Ничего не найдено", imageName: "NoTrackerAfterFiltering")
+        setupNoTracker(title: noSelectedTrakers, imageName: "NoTrackerAfterFiltering")
     }
     
     private func setupNoTracker(title: String, imageName: String) {
-        view.addSubview(noTrackersImage)
-        view.addSubview(noTrackersLabel)
-        noTrackersImage.translatesAutoresizingMaskIntoConstraints = false
-        noTrackersLabel.translatesAutoresizingMaskIntoConstraints = false
+        [noTrackersImage, noTrackersLabel].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
+        
         noTrackersImage.image = UIImage(named: imageName)
         noTrackersLabel.text = title
         noTrackersLabel.textColor = UIColor.ypBlack
@@ -132,36 +142,28 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         guard let cell = cell as? TrackerCollectionViewCell else {
             return TrackerCollectionViewCell()
         }
-        
         cell.delegate = self
-        switch countComletedTrackers{
-        case 1:
-            cell.countLabel.text = "\(countComletedTrackers) день"
-        case 2, 3, 4:
-            cell.countLabel.text = "\(countComletedTrackers) дня"
-        default:
-            cell.countLabel.text = "\(countComletedTrackers) дней"
-        }
-        
-        cell.titleLabel.text = selectedCategories[indexPath.section].trackers[indexPath.item].name //название трекера
-        cell.image.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color // цвет карточки
-        cell.emoji.text = selectedCategories[indexPath.section].trackers[indexPath.item].emoji // эмодзи
-        //задание кнопки в зависимости от нажатия
+        let format = NSLocalizedString("numberOfDay", comment: "")
+        let text = String.localizedStringWithFormat (format, countComletedTrackers)
+        cell.updateCountLabel(text: text)
+        cell.updateTitleLabel(text: selectedCategories[indexPath.section].trackers[indexPath.item].name)
+        cell.updateColorImage(color: selectedCategories[indexPath.section].trackers[indexPath.item].color)
+        cell.updateEmoji(text: selectedCategories[indexPath.section].trackers[indexPath.item].emoji)
         if !istTrackerRecord {
-            cell.button.setImage(UIImage(named:"AddDay")?.withRenderingMode(.alwaysTemplate), for: .normal) // .withRenderingMode(.alwaysTemplate) для возможности изменения цвета картинки
-            cell.button.backgroundColor = UIColor.white.withAlphaComponent(1.0)
-            cell.button.tintColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(1.0)
+            cell.updateButton(backgroundColor: UIColor.white.withAlphaComponent(1.0),
+                              tintColor: selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(1.0),
+                              imageButton: UIImage(named:"AddDay")?.withRenderingMode(.alwaysTemplate) ?? UIImage())
         } else {
-            cell.button.setImage(UIImage(named:"DoneDay")?.withRenderingMode(.alwaysTemplate), for: .normal)
-            cell.button.backgroundColor = selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(0.3)
-            cell.button.tintColor = UIColor.white
+            cell.updateButton(backgroundColor: selectedCategories[indexPath.section].trackers[indexPath.item].color.withAlphaComponent(0.3),
+                              tintColor: UIColor.white,
+                              imageButton: UIImage(named:"DoneDay")?.withRenderingMode(.alwaysTemplate) ?? UIImage())
         }
         return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {     //для задания хедера
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as! TrackerSupplementaryView
-        header.titleLabel.text = selectedCategories[indexPath.section].name
+        header.updateTitleLabel(text: selectedCategories[indexPath.section].name)
         return header
     }
 }
@@ -204,9 +206,17 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
         
         if selectedDate <= nowDate {
             if !isTrackerRecord {
-                try! trackerRecordStore.addNewTrackerRecord(tracker)
+                do {
+                    try trackerRecordStore.addNewTrackerRecord(tracker)
+                } catch let error as NSError {
+                    print(error.userInfo)
+                }
             } else {
-                try! trackerRecordStore.deleteTrackerRecord(tracker)
+                do {
+                    try trackerRecordStore.deleteTrackerRecord(tracker)
+                } catch let error as NSError {
+                    print(error.userInfo)
+                }
             }
             didUpdate()
         }
@@ -217,11 +227,11 @@ extension TrackersViewController: TrackerCollectionViewCellDelegate {
 extension TrackersViewController: TrackerCategoryStoreDelegate {
     func didUpdate() {
         if isNoTracker {
-            setupNoTracker(title: "Что будем отслеживать?", imageName: "MainViewError")
+            setupNoTracker(title: emptyTrekers, imageName: "MainViewError")
         } else {
             if selectedCategories.isEmpty {
                 collectionView.reloadData()
-                setupNoTracker(title: "Ничего не найдено", imageName: "NoTrackerAfterFiltering")
+                setupNoTracker(title: noSelectedTrakers, imageName: "NoTrackerAfterFiltering")
             } else {
                 hideNoTracker()
                 collectionView.reloadData()

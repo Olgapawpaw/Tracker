@@ -6,8 +6,8 @@ class Helpers {
         let date = NSDate()
         let calendar = Calendar.current
         let dateComponents = calendar.dateComponents([.day, .month, .year], from: date as Date)
-        let dateWithoutTime = calendar.date(from: dateComponents)!
-        return dateWithoutTime
+        let dateWithoutTime = calendar.date(from: dateComponents)
+        return dateWithoutTime ?? Date()
     }
     
     func getNowWeekday() -> Int {

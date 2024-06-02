@@ -1,7 +1,6 @@
 import Foundation
 
 final class MarshallingWeekDay {
-    
     // MARK: - Public Properties
     static func weekDayToString(from weekDay: [WeekDay]) -> String {
         var weekDayString = String()

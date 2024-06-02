@@ -3,7 +3,6 @@ import UIKit
 
 
 final class NewHabitShedulerTableViewCell: UITableViewCell {
-    
     // MARK: - Public Properties
     let buttonLabel = UILabel()
     let switchView = UISwitch(frame: .zero)

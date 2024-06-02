@@ -1,12 +1,12 @@
 import Foundation
 import UIKit
 
+
 protocol NewHabitViewControllerDelegate: AnyObject {
     func addCategory(newCategory: TrackerCategory, newTracker: Tracker)
 }
 
 final class NewHabitViewController: UIViewController {
-    
     // MARK: - Public Properties
     weak var delegate: NewHabitViewControllerDelegate?
     
@@ -25,14 +25,23 @@ final class NewHabitViewController: UIViewController {
         let contentView = UIView()
         contentView.backgroundColor = .white
         contentView.frame.size = contentSize
+        contentView.backgroundColor = UIColor.viewBackgroundColor
         return contentView
     }()
+    private let create = NSLocalizedString("create", comment: "")
+    private let cancel = NSLocalizedString("cancel", comment: "")
+    private let newTrackerName = NSLocalizedString("newTracker.name", comment: "")
+    private let everyDay = NSLocalizedString("everyDay", comment: "")
+    private let emojiText = NSLocalizedString("emoji", comment: "")
+    private let color = NSLocalizedString("color", comment: "")
     private var selectedColor = UIColor()
+    private var selectedColorIsEmpty = true
     private var selectedEmoji = String()
-    private var categoryName = "Домашний уют"
+    private var selectedCategory = String()
     private var sheduler = [WeekDay]()
     private var tracker = [Tracker]()
-    private let namesCell = ["Категория", "Расписание"]
+    private let namesCell = [NSLocalizedString("category", comment: ""),
+                             NSLocalizedString("sheduler", comment: "")]
     private let trackerName = UITextField()
     private let createButton = UIButton()
     private let cancelButton = UIButton()
@@ -47,13 +56,13 @@ final class NewHabitViewController: UIViewController {
         return table
     }()
     private let weekDayShortNames = [
-        WeekDay.monday: "Пн",
-        WeekDay.tuesday: "Вт",
-        WeekDay.wednesday: "Ср",
-        WeekDay.thursday: "Чт",
-        WeekDay.friday: "Пт",
-        WeekDay.saturday: "Сб",
-        WeekDay.sunday: "Вс"
+        WeekDay.monday: NSLocalizedString("mondayShort", comment: ""),
+        WeekDay.tuesday: NSLocalizedString("tuesdayShort", comment: ""),
+        WeekDay.wednesday: NSLocalizedString("wednesdayShort", comment: ""),
+        WeekDay.thursday: NSLocalizedString("thursdayShort", comment: ""),
+        WeekDay.friday: NSLocalizedString("fridayShort", comment: ""),
+        WeekDay.saturday: NSLocalizedString("saturdayShort", comment: ""),
+        WeekDay.sunday: NSLocalizedString("sundayShort", comment: "")
     ]
     private let colors: [UIColor] = [
         .colorSelection1, .colorSelection2, .colorSelection3,
@@ -70,7 +79,7 @@ final class NewHabitViewController: UIViewController {
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.viewBackgroundColor
         setupScrollView()
         setupTableView()
         setupTrackerName()
@@ -88,7 +97,7 @@ final class NewHabitViewController: UIViewController {
                                  color: selectedColor,
                                  emoji: selectedEmoji,
                                  sheduler: sheduler)
-        let newCategory = TrackerCategory(name: categoryName, trackers: [newTracker])
+        let newCategory = TrackerCategory(name: selectedCategory, trackers: [newTracker])
         delegate?.addCategory(newCategory: newCategory, newTracker: newTracker)
         self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
     }
@@ -103,15 +112,15 @@ final class NewHabitViewController: UIViewController {
     
     // MARK: - Private Methods
     private func activateCreateButton() {
-        if trackerName.text?.isEmpty == true {
-            changeButton(tittle: "Создать",
+        if trackerName.text?.isEmpty == true || selectedEmoji.isEmpty || selectedCategory.isEmpty || sheduler.isEmpty || selectedColorIsEmpty {
+            changeButton(tittle: create,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.ypGray,
                          borderWidth: 0,
                          button: createButton)
             createButton.isEnabled = false
         } else {
-            changeButton(tittle: "Создать",
+            changeButton(tittle: create,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.black,
                          borderWidth: 0,
@@ -158,7 +167,7 @@ final class NewHabitViewController: UIViewController {
         trackerName.backgroundColor = UIColor.ypLightGray.withAlphaComponent(0.3)
         trackerName.layer.cornerRadius = 16
         trackerName.layer.masksToBounds = true
-        trackerName.placeholder = "Введите название трекера"
+        trackerName.placeholder = newTrackerName
         trackerName.font = UIFont.systemFont(ofSize: 17)
         trackerName.clearButtonMode = .always
         trackerName.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 75))
@@ -175,12 +184,12 @@ final class NewHabitViewController: UIViewController {
     }
     
     private func setupButton() {
-        changeButton(tittle: "Создать",
+        changeButton(tittle: create,
                      colorTitle: UIColor.white,
                      colorBackround: UIColor.ypGray,
                      borderWidth: 0,
                      button: createButton)
-        changeButton(tittle: "Отменить",
+        changeButton(tittle: cancel,
                      colorTitle: UIColor.ypRed,
                      colorBackround: UIColor.white,
                      borderWidth: 1,
@@ -230,20 +239,20 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
         }
         switch indexPath.item {
         case 0:
-            if categoryName.isEmpty {
-                cell.titleLabel.text = namesCell[indexPath.item]
+            if selectedCategory.isEmpty {
+                cell.updateTitleLabelText(text: namesCell[indexPath.item])
             } else {
-                cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: categoryName)
+                cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: selectedCategory))
             }
         case 1:
             if sheduler.isEmpty {
-                cell.titleLabel.text = namesCell[indexPath.item]
+                cell.updateTitleLabelText(text: namesCell[indexPath.item])
             } else {
                 switch sheduler {
                 case WeekDay.allCases:
-                    cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: "Каждый день")
+                    cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: everyDay))
                 default:
-                    cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: createStrWeekDayShortName())
+                    cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: createStrWeekDayShortName()))
                 }
             }
         default: break
@@ -260,7 +269,11 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if indexPath.item == 0 {
-            let viewController = NewCategoryViewController()
+            let newCategoryModel = NewCategoryModel()
+            newCategoryModel.delegate = self
+            newCategoryModel.selectedCategory = selectedCategory
+            let newCategoryViewModel = NewCategoryViewModel(for: newCategoryModel)
+            let viewController = NewCategoryViewController(viewModel: newCategoryViewModel)
             let navigationController = UINavigationController(rootViewController: viewController)
             navigationController.viewControllers.first?.navigationItem.title = namesCell[indexPath.item]
             self.navigationController?.present(navigationController, animated: true)
@@ -297,14 +310,19 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
     }
 }
 
-// MARK: - NewHabitShedulerViewControllerDelegate
-extension NewHabitViewController: NewHabitShedulerViewControllerDelegate {
+// MARK: - NewHabitShedulerViewControllerDelegate, NewCategoryModelDelegate
+extension NewHabitViewController: NewHabitShedulerViewControllerDelegate, NewCategoryModelDelegate {
     func updateSheduler(sheduler: [WeekDay]) {
         self.sheduler = sheduler
     }
     
     func updateTable() {
         tableView.reloadData()
+        activateCreateButton()
+    }
+    
+    func updateSelectedCategory(selectedCategory: String) {
+        self.selectedCategory = selectedCategory
     }
 }
 
@@ -329,10 +347,10 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             return  CreateNewTrackerCollectionViewCell()
         }
         if collectionView == emojiCollectionView {
-            cell.label.text = emoji[indexPath.item]
+            cell.updateLabelText(text: emoji[indexPath.item])
         }
         if collectionView == colorCollectionView {
-            cell.label.backgroundColor = colors[indexPath.item]
+            cell.updateLabelBackgroundColor(color: colors[indexPath.item])
         }
         return cell
     }
@@ -340,10 +358,10 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {     //для задания хедера
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as! CreateNewTrackerSupplementaryView
         if collectionView == emojiCollectionView {
-            header.titleLabel.text = "Emoji"
+            header.updateTitleLabel(text: emojiText)
         }
         if collectionView == colorCollectionView {
-            header.titleLabel.text = "Цвет"
+            header.updateTitleLabel(text: color)
         }
         return header
     }
@@ -362,7 +380,9 @@ extension NewHabitViewController: UICollectionViewDataSource, UICollectionViewDe
             selectedCell.layer.borderColor = colors[indexPath.item].withAlphaComponent(0.3).cgColor
             selectedCell.layer.borderWidth = 3
             selectedColor = colors[indexPath.item]
+            selectedColorIsEmpty = false
         }
+        activateCreateButton()
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath){

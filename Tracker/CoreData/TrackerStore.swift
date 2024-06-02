@@ -24,28 +24,43 @@ final class TrackerStore: NSObject {
     func checkExistTrackers() -> Bool {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         request.resultType = .countResultType
-        let result = try! context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
-        if result.finalResult?[0] as! Int > 0 {
-            return false
-        } else {
-            return true
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            if result.finalResult?[0] as! Int > 0 {
+                return false
+            } else {
+                return true
+            }
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Bool()
         }
     }
     
     func getSelectedTrackers(day: Int) throws -> [TrackerCoreData] {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         request.returnsObjectsAsFaults = false
-        request.predicate = NSPredicate(format: "sheduler CONTAINS[n] %@", (weekDay[day] as CVarArg?)!)
-        let result = try! context.fetch(request)
-        return result
+        request.predicate = NSPredicate(format: "sheduler CONTAINS[n] %@", (weekDay[day] as CVarArg? ?? String()))
+        do {
+            let result = try context.fetch(request)
+            return result
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
+        }
     }
     
     func getSearchTrackers(text: String, day: Int) throws -> [TrackerCoreData] {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         request.returnsObjectsAsFaults = false
-        request.predicate = NSPredicate(format: "name CONTAINS[cd] %@ AND sheduler CONTAINS[n] %@", text, (weekDay[day] as CVarArg?)!)
-        let result = try! context.fetch(request)
-        return result
+        request.predicate = NSPredicate(format: "name CONTAINS[cd] %@ AND sheduler CONTAINS[n] %@", text, (weekDay[day] as CVarArg? ?? String()))
+        do {
+            let result = try context.fetch(request)
+            return result
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
+        }
     }
     
     func addNewTracker(_ tracker: Tracker, trackerCategory: TrackerCategoryForCoreData) throws {

@@ -7,31 +7,23 @@ protocol TrackerCollectionViewCellDelegate: AnyObject {
 }
 
 final class TrackerCollectionViewCell: UICollectionViewCell {
-    
     // MARK: - Public Properties
     weak var delegate: TrackerCollectionViewCellDelegate?
-    let image = UIImageView()
-    let titleLabel = UILabel()
-    let countLabel = UILabel()
-    let button = UIButton()
-    let emoji = UILabel()
+    
+    // MARK: - Private Properties
+    private let image = UIImageView()
+    private let titleLabel = UILabel()
+    private let countLabel = UILabel()
+    private let button = UIButton()
+    private let emoji = UILabel()
     
     // MARK: - Initializers
     override init(frame: CGRect) {
         super.init(frame: frame)
-        
-        contentView.addSubview(image)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(countLabel)
-        contentView.addSubview(button)
-        contentView.addSubview(emoji)
-        
-        image.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        countLabel.translatesAutoresizingMaskIntoConstraints = false
-        button.translatesAutoresizingMaskIntoConstraints = false
-        emoji.translatesAutoresizingMaskIntoConstraints = false
-        
+        [image, titleLabel, countLabel, button, emoji].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            contentView.addSubview($0)
+        }
         image.layer.cornerRadius = 16
         image.layer.masksToBounds = true
         titleLabel.textColor = UIColor.white
@@ -72,6 +64,29 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             emoji.topAnchor.constraint(equalTo: topAnchor, constant: 12),
             emoji.leftAnchor.constraint(equalTo: leftAnchor, constant: 12),
         ])
+    }
+    
+    // MARK: - Public Methods
+    func updateCountLabel(text: String) {
+        countLabel.text = text
+    }
+    
+    func updateTitleLabel(text: String) {
+        titleLabel.text = text
+    }
+    
+    func updateEmoji(text: String) {
+        emoji.text = text
+    }
+    
+    func updateColorImage(color: UIColor) {
+        image.backgroundColor = color
+    }
+    
+    func updateButton(backgroundColor: UIColor, tintColor: UIColor, imageButton: UIImage) {
+        button.setImage(imageButton, for: .normal)
+        button.backgroundColor = backgroundColor
+        button.tintColor = tintColor
     }
     
     // MARK: - IB Actions

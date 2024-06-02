@@ -4,7 +4,6 @@ import CoreData
 
 
 final class TrackerRecordStore: NSObject {
-    
     // MARK: - Private Properties
     private let context: NSManagedObjectContext
     
@@ -24,11 +23,16 @@ final class TrackerRecordStore: NSObject {
         let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
         request.resultType = .countResultType
         request.predicate = NSPredicate(format: "id == %@ AND date == %@", trackerRecord.id as CVarArg, trackerRecord.date as CVarArg)
-        let result = try! context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
-        if result.finalResult?[0] as! Int > 0 {
-            return true
-        } else {
-            return false
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            if result.finalResult?[0] as! Int > 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Bool()
         }
     }
     
@@ -36,8 +40,13 @@ final class TrackerRecordStore: NSObject {
         let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
         request.resultType = .countResultType
         request.predicate = NSPredicate(format: "id == %@", trackerRecord.id as CVarArg)
-        let result = try! context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
-        return result.finalResult?[0] as! Int
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            return result.finalResult?[0] as! Int
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Int()
+        }
     }
     
     func addNewTrackerRecord(_ trackerRecord: TrackerRecord) throws {

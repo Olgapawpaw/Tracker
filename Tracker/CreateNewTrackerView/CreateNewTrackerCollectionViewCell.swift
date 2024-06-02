@@ -1,10 +1,10 @@
 import Foundation
 import UIKit
 
+
 final class CreateNewTrackerCollectionViewCell: UICollectionViewCell {
-    //NewHabitCollectionViewCell
-    // MARK: - Public Properties
-    let label = UILabel()
+    // MARK: - Private Properties
+    private let label = UILabel()
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -21,6 +21,15 @@ final class CreateNewTrackerCollectionViewCell: UICollectionViewCell {
             label.widthAnchor.constraint(equalToConstant: 40),
             label.heightAnchor.constraint(equalToConstant: 40)
         ])
+    }
+    
+    // MARK: - Public Methods
+    func updateLabelText(text: String) {
+        label.text = text
+    }
+    
+    func updateLabelBackgroundColor(color: UIColor) {
+        label.backgroundColor = color
     }
     
     required init?(coder: NSCoder) {

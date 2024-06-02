@@ -1,12 +1,12 @@
 import Foundation
 import UIKit
 
+
 protocol NewEventViewControllerDelegate: AnyObject {
     func addCategory(newCategory: TrackerCategory, newTracker: Tracker)
 }
 
 final class NewEventViewController: UIViewController {
-    
     // MARK: - Public Properties
     weak var delegate: NewEventViewControllerDelegate?
     
@@ -25,13 +25,20 @@ final class NewEventViewController: UIViewController {
         let contentView = UIView()
         contentView.backgroundColor = .white
         contentView.frame.size = contentSize
+        contentView.backgroundColor = UIColor.viewBackgroundColor
         return contentView
     }()
+    private let create = NSLocalizedString("create", comment: "")
+    private let cancel = NSLocalizedString("cancel", comment: "")
+    private let newTrackerName = NSLocalizedString("newTracker.name", comment: "")
+    private let emojiText = NSLocalizedString("emoji", comment: "")
+    private let color = NSLocalizedString("color", comment: "")
     private var selectedColor = UIColor()
+    private var selectedColorIsEmpty = true
     private var selectedEmoji = String()
-    private var categoryName = "Домашний уют"
+    private var selectedCategory = String()
     private var tracker = [Tracker]()
-    private let namesCell = ["Категория"]
+    private let namesCell = [NSLocalizedString("category", comment: "")]
     private let trackerName = UITextField()
     private let createButton = UIButton()
     private let cancelButton = UIButton()
@@ -60,7 +67,7 @@ final class NewEventViewController: UIViewController {
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.viewBackgroundColor
         setupScrollView()
         setupTableView()
         setupTrackerName()
@@ -78,7 +85,7 @@ final class NewEventViewController: UIViewController {
                                  color: selectedColor,
                                  emoji: selectedEmoji,
                                  sheduler: WeekDay.allCases)
-        let newCategory = TrackerCategory(name: categoryName,
+        let newCategory = TrackerCategory(name: selectedCategory,
                                           trackers: [newTracker])
         delegate?.addCategory(newCategory: newCategory, newTracker: newTracker)
         self.presentingViewController?.presentingViewController?.dismiss(animated: true, completion: nil)
@@ -94,15 +101,15 @@ final class NewEventViewController: UIViewController {
     
     // MARK: - Private Methods
     private func activateCreateButton() {
-        if trackerName.text?.isEmpty == true {
-            changeButton(tittle: "Создать",
+        if trackerName.text?.isEmpty == true || selectedEmoji.isEmpty || selectedCategory.isEmpty || selectedColorIsEmpty {
+            changeButton(tittle: create,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.ypGray,
                          borderWidth: 0,
                          button: createButton)
             createButton.isEnabled = false
         } else {
-            changeButton(tittle: "Создать",
+            changeButton(tittle: create,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.black,
                          borderWidth: 0,
@@ -149,7 +156,7 @@ final class NewEventViewController: UIViewController {
         trackerName.backgroundColor = UIColor.ypLightGray.withAlphaComponent(0.3)
         trackerName.layer.cornerRadius = 16
         trackerName.layer.masksToBounds = true
-        trackerName.placeholder = "Введите название трекера"
+        trackerName.placeholder = newTrackerName
         trackerName.font = UIFont.systemFont(ofSize: 17)
         trackerName.clearButtonMode = .always
         trackerName.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 75))
@@ -166,12 +173,12 @@ final class NewEventViewController: UIViewController {
     }
     
     private func setupButton() {
-        changeButton(tittle: "Создать",
+        changeButton(tittle: create,
                      colorTitle: UIColor.white,
                      colorBackround: UIColor.ypGray,
                      borderWidth: 0,
                      button: createButton)
-        changeButton(tittle: "Отменить",
+        changeButton(tittle: cancel,
                      colorTitle: UIColor.ypRed,
                      colorBackround: UIColor.white,
                      borderWidth: 1,
@@ -219,10 +226,10 @@ extension NewEventViewController: UITableViewDelegate, UITableViewDataSource{
         guard let cell = cell as? CreateNewTrackerTableViewCell else {
             return CreateNewTrackerTableViewCell()
         }
-        if categoryName.isEmpty {
-            cell.titleLabel.text = namesCell[indexPath.item]
+        if selectedCategory.isEmpty {
+            cell.updateTitleLabelText(text: namesCell[indexPath.item])
         } else {
-            cell.titleLabel.attributedText = createAtributedText(cell: cell, indexPath: indexPath, text: categoryName)
+            cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: selectedCategory))
         }
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         return cell
@@ -233,7 +240,11 @@ extension NewEventViewController: UITableViewDelegate, UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let viewController = NewCategoryViewController()
+        let newCategoryModel = NewCategoryModel()
+        newCategoryModel.delegate = self
+        newCategoryModel.selectedCategory = selectedCategory
+        let newCategoryViewModel = NewCategoryViewModel(for: newCategoryModel)
+        let viewController = NewCategoryViewController(viewModel: newCategoryViewModel)
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.viewControllers.first?.navigationItem.title = namesCell[indexPath.item]
         self.navigationController?.present(navigationController, animated: true)
@@ -270,10 +281,10 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
             return  CreateNewTrackerCollectionViewCell()
         }
         if collectionView == emojiCollectionView {
-            cell.label.text = emoji[indexPath.item]
+            cell.updateLabelText(text: emoji[indexPath.item])
         }
         if collectionView == colorCollectionView {
-            cell.label.backgroundColor = colors[indexPath.item]
+            cell.updateLabelBackgroundColor(color: colors[indexPath.item])
         }
         return cell
     }
@@ -281,10 +292,10 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {     //для задания хедера
         let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "header", for: indexPath) as! CreateNewTrackerSupplementaryView
         if collectionView == emojiCollectionView {
-            header.titleLabel.text = "Emoji"
+            header.updateTitleLabel(text: emojiText)
         }
         if collectionView == colorCollectionView {
-            header.titleLabel.text = "Цвет"
+            header.updateTitleLabel(text: color)
         }
         return header
     }
@@ -303,7 +314,9 @@ extension NewEventViewController: UICollectionViewDataSource, UICollectionViewDe
             selectedCell.layer.borderColor = colors[indexPath.item].withAlphaComponent(0.3).cgColor
             selectedCell.layer.borderWidth = 3
             selectedColor = colors[indexPath.item]
+            selectedColorIsEmpty = false
         }
+        activateCreateButton()
     }
     
     func collectionView(_ collectionView: UICollectionView, didDeselectItemAt indexPath: IndexPath){
@@ -336,5 +349,17 @@ extension NewEventViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         return UIEdgeInsets(top: 24, left: 0, bottom: 0, right: 0)
+    }
+}
+
+// MARK: - NewHabitShedulerViewControllerDelegate, NewCategoryModelDelegate
+extension NewEventViewController: NewCategoryModelDelegate {
+    func updateTable() {
+        tableView.reloadData()
+        activateCreateButton()
+    }
+    
+    func updateSelectedCategory(selectedCategory: String) {
+        self.selectedCategory = selectedCategory
     }
 }

@@ -8,13 +8,19 @@ protocol NewHabitShedulerViewControllerDelegate: AnyObject {
 }
 
 final class NewHabitShedulerViewController: UIViewController {
-    
     // MARK: - Public Properties
     weak var delegate: NewHabitShedulerViewControllerDelegate?
     var sheduler = [WeekDay]()
     
     // MARK: - Private Properties
-    private let weekDayForView = ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота", "Воскресенье"]
+    private let ready = NSLocalizedString("ready", comment: "")
+    private let weekDayForView = [NSLocalizedString("monday", comment: ""),
+                                  NSLocalizedString("tuesday", comment: ""),
+                                  NSLocalizedString("wednesday", comment: ""),
+                                  NSLocalizedString("thursday", comment: ""),
+                                  NSLocalizedString("friday", comment: ""),
+                                  NSLocalizedString("saturday", comment: ""),
+                                  NSLocalizedString("sunday", comment: "")]
     private let weekDay = [WeekDay.monday, WeekDay.tuesday, WeekDay.wednesday, WeekDay.thursday, WeekDay.friday, WeekDay.saturday, WeekDay.sunday]
     private let readyButton = UIButton()
     private lazy var tableView: UITableView = {
@@ -57,7 +63,7 @@ final class NewHabitShedulerViewController: UIViewController {
     private func setupButton() {
         view.addSubview(readyButton)
         readyButton.translatesAutoresizingMaskIntoConstraints = false
-        readyButton.setTitle("Готово", for: .normal)
+        readyButton.setTitle(ready, for: .normal)
         readyButton.setTitleColor(UIColor.white, for: .normal)
         readyButton.backgroundColor = UIColor.black
         readyButton.layer.cornerRadius = 16

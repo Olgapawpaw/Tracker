@@ -1,9 +1,10 @@
 import Foundation
 import UIKit
 
+
 final class CreateNewTrackerSupplementaryView: UICollectionReusableView {
-    // MARK: - Public Properties
-    let titleLabel = UILabel()
+    // MARK: - Private Properties
+    private let titleLabel = UILabel()
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -16,6 +17,11 @@ final class CreateNewTrackerSupplementaryView: UICollectionReusableView {
             titleLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 10),
             titleLabel.centerYAnchor.constraint(equalTo: centerYAnchor),
         ])
+    }
+    
+    // MARK: - Public Methods
+    func updateTitleLabel(text: String){
+        titleLabel.text = text
     }
     
     required init?(coder: NSCoder) {
