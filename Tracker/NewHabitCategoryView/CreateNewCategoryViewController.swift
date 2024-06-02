@@ -6,11 +6,13 @@ protocol CreateNewCategoryViewControllerDelegate: AnyObject {
     func updateData()
 }
 
-class CreateNewCategoryViewController: UIViewController {
+final class CreateNewCategoryViewController: UIViewController {
     // MARK: - Public Properties
     weak var delegate: CreateNewCategoryViewControllerDelegate?
     
     // MARK: - Private Properties
+    private let newCategoryName = NSLocalizedString("newCategory.name", comment: "")
+    private let ready = NSLocalizedString("ready", comment: "")
     private let categoryNameTextField = UITextField()
     private let readyButton = UIButton()
     private let newCategory = String()
@@ -19,7 +21,7 @@ class CreateNewCategoryViewController: UIViewController {
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.viewBackgroundColor
         setupCategoryNameTextField()
         setupButton()
     }
@@ -44,7 +46,7 @@ class CreateNewCategoryViewController: UIViewController {
         categoryNameTextField.backgroundColor = UIColor.ypLightGray.withAlphaComponent(0.3)
         categoryNameTextField.layer.cornerRadius = 16
         categoryNameTextField.layer.masksToBounds = true
-        categoryNameTextField.placeholder = "Введите название категории"
+        categoryNameTextField.placeholder = newCategoryName
         categoryNameTextField.font = UIFont.systemFont(ofSize: 17)
         categoryNameTextField.clearButtonMode = .always
         categoryNameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 16, height: 75))
@@ -61,7 +63,7 @@ class CreateNewCategoryViewController: UIViewController {
     }
     
     private func setupButton() {
-        changeButton(tittle: "Готово",
+        changeButton(tittle: ready,
                      colorTitle: UIColor.white,
                      colorBackround: UIColor.ypGray,
                      button: readyButton)
@@ -89,13 +91,13 @@ class CreateNewCategoryViewController: UIViewController {
     
     private func activateCreateButton() {
         if categoryNameTextField.text?.isEmpty == true {
-            changeButton(tittle: "Готово",
+            changeButton(tittle: ready,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.ypGray,
                          button: readyButton)
             readyButton.isEnabled = false
         } else {
-            changeButton(tittle: "Готово",
+            changeButton(tittle: ready,
                          colorTitle: UIColor.white,
                          colorBackround: UIColor.black,
                          button: readyButton)

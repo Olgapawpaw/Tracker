@@ -4,6 +4,7 @@ import UIKit
 
 final class PageViewController: UIViewController {
     // MARK: - Private Properties
+    private var buttonText = NSLocalizedString("onboarding.close", comment: "Text button for close onboarding")
     private var text = String()
     private var image = UIImage()
     private var currentPage = Int()
@@ -39,15 +40,10 @@ final class PageViewController: UIViewController {
     
     // MARK: - Private Methods
     private func setupView() {
-        view.addSubview(imageView)
-        view.addSubview(titleLabel)
-        view.addSubview(button)
-        view.addSubview(pageControl)
-        
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        button.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.translatesAutoresizingMaskIntoConstraints = false
+        [imageView, titleLabel, button, pageControl].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+            view.addSubview($0)
+        }
         
         imageView.image = image
         titleLabel.text = text
@@ -61,7 +57,7 @@ final class PageViewController: UIViewController {
         button.layer.cornerRadius = 16
         button.layer.masksToBounds = true
         button.backgroundColor = UIColor.black
-        button.setTitle("Вот это технологии!", for: .normal)
+        button.setTitle(buttonText, for: .normal)
         button.setTitleColor(UIColor.white, for: .normal)
         button.titleLabel?.textAlignment = .center
         pageControl.currentPageIndicatorTintColor = UIColor.black

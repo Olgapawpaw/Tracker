@@ -2,7 +2,6 @@ import Foundation
 import UIKit
 
 final class MarshallingColor {
-    
     // MARK: - Public Properties
     static func colorToString(from color: UIColor) -> String {
         let components = color.cgColor.components

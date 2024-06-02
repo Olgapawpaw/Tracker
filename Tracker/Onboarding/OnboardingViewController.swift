@@ -1,14 +1,16 @@
 import Foundation
 import UIKit
 
+
 final class OnboardingViewController: UIPageViewController {
-    
     // MARK: - Private Properties
+    private let title1 = NSLocalizedString("onboarding.title1", comment: "Text displayed on onboarding")
+    private let title2 = NSLocalizedString("onboarding.title2", comment: "Text displayed on onboarding")
     private lazy var pages: [UIViewController] = {
-        let pages1 = PageViewController(text: "Отслеживайте только то, что хотите",
+        let pages1 = PageViewController(text: title1,
                                         image: UIImage(named: "Page1") ?? UIImage(),
                                         currentPage: 0)
-        let pages2 = PageViewController(text: "Даже если это не литры воды и йога",
+        let pages2 = PageViewController(text: title2,
                                         image: UIImage(named: "Page2") ?? UIImage(),
                                         currentPage: 1)
         return [pages1, pages2]

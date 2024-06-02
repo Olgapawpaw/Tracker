@@ -3,11 +3,15 @@ import UIKit
 
 
 final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarControllerDelegate {
-    
     // MARK: - Public Properties
     let search = UISearchController(searchResultsController: nil)
     
     // MARK: - Private Properties
+    private let createTreackerTitle = NSLocalizedString("createTreacker.title", comment: "")
+    private let trekers = NSLocalizedString("trekers", comment: "")
+    private let statistics = NSLocalizedString("statistics", comment: "")
+    private let cancelEntry = NSLocalizedString("cancelEntry", comment: "")
+    private let searchText = NSLocalizedString("search", comment: "")
     private var searchIsEmpty: Bool {
         guard let text = search.searchBar.text else { return false }
         return text.isEmpty
@@ -46,7 +50,7 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
         let viewController = NewTrackerViewController()
         viewController.delegate = self
         let navigationController = UINavigationController(rootViewController: viewController)
-        navigationController.viewControllers.first?.navigationItem.title = "Создание трекера"
+        navigationController.viewControllers.first?.navigationItem.title = createTreackerTitle
         trackerViewController.navigationController?.present(navigationController, animated: true)
     }
     
@@ -56,11 +60,11 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
             generateVCTracker(
                 viewController: trackerViewController,
                 image: UIImage(named: "Tracker"),
-                title: "Трекеры"),
+                title: trekers),
             generateVCStatistics(
                 viewController: StatisticsViewController(),
                 image: UIImage(named: "Statistics"),
-                title: "Статистика")
+                title: statistics)
         ]
     }
     
@@ -104,7 +108,12 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     
     private func createAddTrackerButtonItem() -> UIBarButtonItem {
         let button = UIButton()
-        button.setImage(UIImage(named: "AddTracker"), for: .normal)
+        if traitCollection.userInterfaceStyle == .dark {
+            button.setImage(UIImage(named: "AddTrackerNight"), for: .normal)
+        } else {
+            button.setImage(UIImage(named: "AddTrackerDay"), for: .normal)
+        }
+        button.imageView?.tintColor = UIColor.black
         button.addTarget(self,
                          action: #selector(onClickAddTrackersButton(_:)),
                          for: .touchUpInside)
@@ -113,10 +122,10 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     }
     
     private func createSearchController() -> UISearchController {
-        search.searchBar.placeholder = "Поиск"
+        search.searchBar.placeholder = searchText
         search.searchResultsUpdater = self
         search.hidesNavigationBarDuringPresentation = false
-        search.searchBar.setValue("Отмена", forKey: "cancelButtonText")
+        search.searchBar.setValue(cancelEntry, forKey: "cancelButtonText")
         //search
         return search
     }

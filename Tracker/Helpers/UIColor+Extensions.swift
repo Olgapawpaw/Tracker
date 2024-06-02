@@ -24,4 +24,5 @@ extension UIColor {
     static var colorSelection16: UIColor{UIColor(named: "ColorSelection16") ?? UIColor.gray}
     static var colorSelection17: UIColor{UIColor(named: "ColorSelection17") ?? UIColor.gray}
     static var colorSelection18: UIColor{UIColor(named: "ColorSelection18") ?? UIColor.gray}
+    static var viewBackgroundColor = UIColor.systemBackground
 }

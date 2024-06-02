@@ -3,9 +3,8 @@ import UIKit
 
 
 final class CreateNewTrackerTableViewCell: UITableViewCell {
-    
-    // MARK: - Public Properties
-    let titleLabel = UILabel()
+    // MARK: - Private Properties
+    private let titleLabel = UILabel()
     
     // MARK: - Initializers
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
@@ -22,6 +21,15 @@ final class CreateNewTrackerTableViewCell: UITableViewCell {
             titleLabel.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 16),
             titleLabel.heightAnchor.constraint(equalToConstant: 46)
         ])
+    }
+    
+    // MARK: - Public Methods
+    func updateTitleLabelText(text: String) {
+        titleLabel.text = text
+    }
+    
+    func updateTitleLabelAttributedText(attribut: NSAttributedString) {
+        titleLabel.attributedText = attribut
     }
     
     required init?(coder: NSCoder) {

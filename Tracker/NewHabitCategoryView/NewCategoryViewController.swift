@@ -4,7 +4,10 @@ import UIKit
 
 final class NewCategoryViewController: UIViewController {
     // MARK: - Private Properties
-    private var viewModel: NewCategoryViewModel?
+    private let newCategoryTitle = NSLocalizedString("newCategory.title", comment: "")
+    private let addCategory = NSLocalizedString("addCategory", comment: "")
+    private let emptyCategory = NSLocalizedString("emptyCategory", comment: "")
+    private var viewModel: NewCategoryViewModel
     private var selectedCategory = String()
     private var category = [String]()
     private let noCategoryImage = UIImageView()
@@ -41,16 +44,21 @@ final class NewCategoryViewController: UIViewController {
     }()
     
     // MARK: - Initializers
-    func initialize(viewModel: NewCategoryViewModel) {
+    init(viewModel: NewCategoryViewModel) {
         self.viewModel = viewModel
+        super.init(nibName: nil, bundle: nil)
         bind()
         viewModel.getData()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
     }
     
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.white
+        view.backgroundColor = UIColor.viewBackgroundColor
         setupScrollView()
         setupTableView()
         setupButton()
@@ -62,14 +70,12 @@ final class NewCategoryViewController: UIViewController {
         let viewController = CreateNewCategoryViewController()
         viewController.delegate = self
         let navigationController = UINavigationController(rootViewController: viewController)
-        navigationController.viewControllers.first?.navigationItem.title = "Новая категория"
+        navigationController.viewControllers.first?.navigationItem.title = newCategoryTitle
         self.navigationController?.present(navigationController, animated: true)
     }
     
     // MARK: - Private Methods
     private func bind() {
-        guard let viewModel = viewModel else { return }
-        
         viewModel.category = { [weak self] category in
             self?.category = category
         }
@@ -104,7 +110,7 @@ final class NewCategoryViewController: UIViewController {
     private func setupButton() {
         contentView.addSubview(addButton)
         addButton.translatesAutoresizingMaskIntoConstraints = false
-        addButton.setTitle("Добавить категорию", for: .normal)
+        addButton.setTitle(addCategory, for: .normal)
         addButton.setTitleColor(UIColor.white, for: .normal)
         addButton.layer.cornerRadius = 16
         addButton.layer.masksToBounds = true
@@ -126,7 +132,7 @@ final class NewCategoryViewController: UIViewController {
         noCategoryImage.translatesAutoresizingMaskIntoConstraints = false
         noCategoryLabel.translatesAutoresizingMaskIntoConstraints = false
         noCategoryImage.image = UIImage(named: "MainViewError")
-        noCategoryLabel.text = "Привычки и события можно \n объеденить по смыслу"
+        noCategoryLabel.text = emptyCategory
         noCategoryLabel.textAlignment = .center
         noCategoryLabel.numberOfLines = 2
         noCategoryLabel.textColor = UIColor.ypBlack
@@ -165,7 +171,7 @@ extension NewCategoryViewController: UITableViewDelegate, UITableViewDataSource{
         guard let cell = cell as? NewCategoryTableViewCell else {
             return NewCategoryTableViewCell()
         }
-        cell.titleLabel.text = category[indexPath.item]
+        cell.updateTitleLabel(text: category[indexPath.item])
         cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
         if category.count - 1 == indexPath.item {
             cell.layer.cornerRadius = 16
@@ -183,7 +189,7 @@ extension NewCategoryViewController: UITableViewDelegate, UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if selectedCategory != category[indexPath.item] {
-            viewModel?.enterSelectedCategory(name: category[indexPath.item])
+            viewModel.enterSelectedCategory(name: category[indexPath.item])
             tableView.reloadData()
             self.dismiss(animated: true)
         }
@@ -194,7 +200,7 @@ extension NewCategoryViewController: UITableViewDelegate, UITableViewDataSource{
 extension NewCategoryViewController: CreateNewCategoryViewControllerDelegate {
     func updateData() {
         bind()
-        viewModel?.getData()
+        viewModel.getData()
         tableView.reloadData()
         showNoCategory(isEmpty: false)
     }

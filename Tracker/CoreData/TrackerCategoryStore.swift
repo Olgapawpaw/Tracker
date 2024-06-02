@@ -8,7 +8,6 @@ protocol TrackerCategoryStoreDelegate: AnyObject {
 }
 
 final class TrackerCategoryStore: NSObject {
-    
     // MARK: - Public Properties
     weak var delegate: TrackerCategoryStoreDelegate?
     
@@ -50,60 +49,71 @@ final class TrackerCategoryStore: NSObject {
         var trackers = [Tracker]()
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
         request.returnsObjectsAsFaults = false
-        let trackerCategoryCoreData = try! context.fetch(request)
         
-        for category in trackerCategoryCoreData {
-            if !nameCategory.contains(where: {$0 == category.name}) {
-                nameCategory.append(category.name ?? "Без названия")
-            }
-        }
-        
-        for name in nameCategory {
+        do {
+            let trackerCategoryCoreData = try context.fetch(request)
+            
             for category in trackerCategoryCoreData {
-                if name == category.name {
-                    for tracker in trackerCoreData {
-                        if tracker.id == category.id {
-                            trackers.append(Tracker(id: tracker.id ?? UUID(),
-                                                    name: tracker.name ?? "" ,
-                                                    color: MarshallingColor.stringToColor(from: tracker.color ?? ""),
-                                                    emoji: tracker.emoji ?? "",
-                                                    sheduler: MarshallingWeekDay.stringToWeekDay(from: tracker.sheduler ?? "")))
-                            break
+                if !nameCategory.contains(where: {$0 == category.name}) {
+                    nameCategory.append(category.name ?? "Без названия")
+                }
+            }
+            
+            for name in nameCategory {
+                for category in trackerCategoryCoreData {
+                    if name == category.name {
+                        for tracker in trackerCoreData {
+                            if tracker.id == category.id {
+                                trackers.append(Tracker(id: tracker.id ?? UUID(),
+                                                        name: tracker.name ?? "" ,
+                                                        color: MarshallingColor.stringToColor(from: tracker.color ?? ""),
+                                                        emoji: tracker.emoji ?? "",
+                                                        sheduler: MarshallingWeekDay.stringToWeekDay(from: tracker.sheduler ?? "")))
+                                break
+                            }
                         }
                     }
                 }
+                if trackers.count > 0 {
+                    trackerCategory.append(TrackerCategory(name: name, trackers: trackers))
+                    trackers.removeAll()
+                }
             }
-            if trackers.count > 0 {
-                trackerCategory.append(TrackerCategory(name: name, trackers: trackers))
-                trackers.removeAll()
-            }
+            return trackerCategory
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
         }
-        return trackerCategory
     }
     
     func getCategoryList() -> [String] {
         var nameCategory = [String]()
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
         request.returnsObjectsAsFaults = false
-        let trackerCategoryCoreData = try! context.fetch(request)
-        
-        for category in trackerCategoryCoreData {
-            if !nameCategory.contains(where: {$0 == category.name}) {
-                nameCategory.append(category.name ?? "Без названия")
+        do {
+            let trackerCategoryCoreData = try context.fetch(request)
+            for category in trackerCategoryCoreData {
+                if !nameCategory.contains(where: {$0 == category.name}) {
+                    nameCategory.append(category.name ?? "Без названия")
+                }
             }
+            return nameCategory
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
         }
-        
-        return nameCategory
     }
     
     func isEmptyCategory() -> Bool {
         let request = NSFetchRequest<TrackerCategoryCoreData>(entityName: "TrackerCategoryCoreData")
         request.resultType = .countResultType
-        let result = try! context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
-        if result.finalResult?[0] as! Int > 0 {
-            return true
-        } else {
-            return false
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            let isPositiveValue = result.finalResult?[0] as! Int > 0
+            return isPositiveValue
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Bool()
         }
     }
     

@@ -6,7 +6,7 @@ protocol NewCategoryModelDelegate: AnyObject {
     func updateTable()
 }
 
-class NewCategoryModel {
+final class NewCategoryModel {
     // MARK: - Public Properties
     weak var delegate: NewCategoryModelDelegate?
     var selectedCategory = String()

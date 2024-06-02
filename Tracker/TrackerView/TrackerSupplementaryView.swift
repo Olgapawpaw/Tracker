@@ -3,8 +3,8 @@ import UIKit
 
 
 final class TrackerSupplementaryView: UICollectionReusableView {
-    // MARK: - Public Properties
-    let titleLabel = UILabel()
+    // MARK: - Private Properties
+    private let titleLabel = UILabel()
     
     // MARK: - Initializers
     override init(frame: CGRect) {
@@ -18,6 +18,10 @@ final class TrackerSupplementaryView: UICollectionReusableView {
             titleLabel.bottomAnchor.constraint(equalTo: bottomAnchor),
             titleLabel.heightAnchor.constraint(equalToConstant: 20)
         ])
+    }
+    
+    func updateTitleLabel(text: String) {
+        titleLabel.text = text
     }
     
     required init?(coder: NSCoder) {

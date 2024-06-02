@@ -1,8 +1,8 @@
 import Foundation
 import UIKit
 
+
 final class RootViewController: UIViewController {
-    
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
