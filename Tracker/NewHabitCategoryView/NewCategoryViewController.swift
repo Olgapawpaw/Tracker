@@ -172,7 +172,9 @@ extension NewCategoryViewController: UITableViewDelegate, UITableViewDataSource{
             return NewCategoryTableViewCell()
         }
         cell.updateTitleLabel(text: category[indexPath.item])
-        cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        if indexPath.item == category.count - 1 {
+            cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
+        }
         if category.count - 1 == indexPath.item {
             cell.layer.cornerRadius = 16
             cell.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]

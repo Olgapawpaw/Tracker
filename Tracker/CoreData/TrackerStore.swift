@@ -50,6 +50,48 @@ final class TrackerStore: NSObject {
         }
     }
     
+    func getSelectedCompletedTrackers(day: Int, trackerRecordCoreData: [TrackerRecordCoreData]) throws -> [TrackerCoreData] {
+        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "sheduler CONTAINS[n] %@", (weekDay[day] as CVarArg? ?? String()))
+        do {
+            var result = [TrackerCoreData]()
+            let trackerCoreData = try context.fetch(request)
+            for tracker in trackerCoreData {
+                for trackerRecord in trackerRecordCoreData {
+                    if tracker.id == trackerRecord.id {
+                        result.append(tracker)
+                    }
+                }
+            }
+            return result
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
+        }
+    }
+    
+    func getSelectedUnCompletedTrackers(day: Int, trackerRecordCoreData: [TrackerRecordCoreData]) throws -> [TrackerCoreData] {
+        let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "sheduler CONTAINS[n] %@", (weekDay[day] as CVarArg? ?? String()))
+        do {
+            let trackerCoreData = try context.fetch(request)
+            var result = trackerCoreData
+            for tracker in trackerCoreData {
+                for trackerRecord in trackerRecordCoreData {
+                    if tracker.id == trackerRecord.id {
+                        result.removeAll(where: {$0.id == tracker.id})
+                    }
+                }
+            }
+            return result
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
+        }
+    }
+    
     func getSearchTrackers(text: String, day: Int) throws -> [TrackerCoreData] {
         let request = NSFetchRequest<TrackerCoreData>(entityName: "TrackerCoreData")
         request.returnsObjectsAsFaults = false
@@ -68,12 +110,21 @@ final class TrackerStore: NSObject {
         let trackerCategoryCoreData = TrackerCategoryCoreData(context: context)
         trackerCategoryCoreData.id = trackerCategory.id
         trackerCategoryCoreData.name = trackerCategory.name
+        trackerCategoryCoreData.oldCategoryName = trackerCategory.oldCategoryName
         trackerCoreData.category = trackerCategoryCoreData
         trackerCoreData.id = tracker.id
         trackerCoreData.name = tracker.name
         trackerCoreData.color = MarshallingColor.colorToString(from: tracker.color)
         trackerCoreData.emoji = tracker.emoji
         trackerCoreData.sheduler = MarshallingWeekDay.weekDayToString(from: tracker.sheduler)
+        try context.save()
+    }
+    
+    func deleteTracker(_ id: UUID) throws {
+        let deleteFetch = NSFetchRequest<NSFetchRequestResult>(entityName: "TrackerCoreData")
+        deleteFetch.predicate = NSPredicate(format: "id == %@", id as CVarArg)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: deleteFetch)
+        try context.execute(deleteRequest)
         try context.save()
     }
 }

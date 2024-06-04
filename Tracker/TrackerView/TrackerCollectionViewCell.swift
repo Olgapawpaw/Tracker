@@ -12,6 +12,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Private Properties
     private let image = UIImageView()
+    private let imagePin = UIImageView()
     private let titleLabel = UILabel()
     private let countLabel = UILabel()
     private let button = UIButton()
@@ -24,6 +25,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
             $0.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview($0)
         }
+        imagePin.translatesAutoresizingMaskIntoConstraints = false
+        self.layer.cornerRadius = 16
+        self.layer.masksToBounds = true
+        imagePin.image = UIImage(named: "Pin")
         image.layer.cornerRadius = 16
         image.layer.masksToBounds = true
         titleLabel.textColor = UIColor.white
@@ -66,6 +71,10 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Public Methods
     func updateCountLabel(text: String) {
         countLabel.text = text
@@ -83,6 +92,20 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
         image.backgroundColor = color
     }
     
+    func showImagePin() {
+        image.addSubview(imagePin)
+        NSLayoutConstraint.activate([
+            imagePin.topAnchor.constraint(equalTo: image.topAnchor, constant: 18),
+            imagePin.rightAnchor.constraint(equalTo: image.rightAnchor, constant: -12),
+            imagePin.widthAnchor.constraint(equalToConstant: 8),
+            imagePin.heightAnchor.constraint(equalToConstant: 12)
+        ])
+    }
+    
+    func hideImagePin() {
+        imagePin.removeFromSuperview()
+    }
+    
     func updateButton(backgroundColor: UIColor, tintColor: UIColor, imageButton: UIImage) {
         button.setImage(imageButton, for: .normal)
         button.backgroundColor = backgroundColor
@@ -91,11 +114,7 @@ final class TrackerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - IB Actions
     @objc func onClick() { //при нажатии на кнопку "+"
+        AnalyticsService.report(event: "click", params: ["screen" : "Main", "item" : "track"])
         delegate?.changeCompletedTrackers(self)
-    }
-    
-    //обязательный инициализатор
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

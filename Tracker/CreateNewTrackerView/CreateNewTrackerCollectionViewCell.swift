@@ -23,6 +23,10 @@ final class CreateNewTrackerCollectionViewCell: UICollectionViewCell {
         ])
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Public Methods
     func updateLabelText(text: String) {
         label.text = text
@@ -30,9 +34,5 @@ final class CreateNewTrackerCollectionViewCell: UICollectionViewCell {
     
     func updateLabelBackgroundColor(color: UIColor) {
         label.backgroundColor = color
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 }

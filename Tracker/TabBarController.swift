@@ -22,16 +22,21 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     private let createNewTrackerViewController = NewTrackerViewController()
     private var weekday = Int()
     private var selectedDate = Date()
-    private var helpers = Helpers()
-    
     
     // MARK: - Overrides Methods
     override func viewDidLoad() {
         super.viewDidLoad()
         generateTabBar()
         addBorderForTabBar(color: UIColor.ypLightGray, thickness: 1.00)
-        weekday = helpers.getNowWeekday()
-        selectedDate = helpers.getNowDate()
+        weekday = Helpers.getNowWeekday()
+        selectedDate = Helpers.getNowDate()
+        trackerViewController.delegate = self
+    }
+    
+    override func tabBar(_ tabBar: UITabBar, didSelect: UITabBarItem) {
+        if didSelect.title == statistics {
+            statisticsViewController.setupView()
+        }
     }
     
     // MARK: - IB Actions
@@ -47,6 +52,7 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     }
     
     @objc private func onClickAddTrackersButton(_ sender: UIButton) {
+        AnalyticsService.report(event: "click", params: ["screen" : "Main", "item" : "add_track"])
         let viewController = NewTrackerViewController()
         viewController.delegate = self
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -62,7 +68,7 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
                 image: UIImage(named: "Tracker"),
                 title: trekers),
             generateVCStatistics(
-                viewController: StatisticsViewController(),
+                viewController: statisticsViewController,
                 image: UIImage(named: "Statistics"),
                 title: statistics)
         ]
@@ -108,12 +114,8 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
     
     private func createAddTrackerButtonItem() -> UIBarButtonItem {
         let button = UIButton()
-        if traitCollection.userInterfaceStyle == .dark {
-            button.setImage(UIImage(named: "AddTrackerNight"), for: .normal)
-        } else {
-            button.setImage(UIImage(named: "AddTrackerDay"), for: .normal)
-        }
-        button.imageView?.tintColor = UIColor.black
+        button.setImage(UIImage(named: "AddTrackerDay")?.withRenderingMode(.alwaysTemplate), for: .normal)
+        button.imageView?.tintColor = UIColor.ypBlack
         button.addTarget(self,
                          action: #selector(onClickAddTrackersButton(_:)),
                          for: .touchUpInside)
@@ -158,5 +160,13 @@ extension TabBarController: UISearchResultsUpdating {
         } else {
             trackerViewController.updateSelectedCategories(selectedDate: selectedDate, weekday: weekday)
         }
+    }
+}
+
+// MARK: - TrackerViewControllerDelegate
+extension TabBarController: TrackersViewControllerDelegate {
+    func changeDatePicker() {
+        datePicker.date = Helpers.getNowDate()
+        trackerViewController.updateSelectedCategories(selectedDate: Helpers.getNowDate(), weekday: Helpers.getNowWeekday())
     }
 }
