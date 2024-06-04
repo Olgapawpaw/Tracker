@@ -310,6 +310,11 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
     
+    func collectionView(_ collectionView: UICollectionView, contextMenuConfiguration configuration: UIContextMenuConfiguration, highlightPreviewForItemAt indexPath: IndexPath) -> UITargetedPreview? {
+        guard let cell = collectionView.cellForItem(at: indexPath) as? TrackerCollectionViewCell else { return nil }
+        return UITargetedPreview(view: cell.topContainer)
+    }
+    
     func collectionView(_ collectionView: UICollectionView, contextMenuConfigurationForItemsAt indexPaths: [IndexPath], point: CGPoint) -> UIContextMenuConfiguration? {
         guard indexPaths.count > 0 else {
             return nil
@@ -346,7 +351,6 @@ extension TrackersViewController: UICollectionViewDataSource, UICollectionViewDe
         }
     }
 }
-
 
 // MARK: - UICollectionViewDelegateFlowLayout
 extension TrackersViewController: UICollectionViewDelegateFlowLayout {
