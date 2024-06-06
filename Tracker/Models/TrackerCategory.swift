@@ -4,7 +4,8 @@ import UIKit
 
 struct TrackerCategoryForCoreData {
     let name: String
-    var id: UUID
+    let id: UUID
+    let oldCategoryName: String?
 }
 
 struct TrackerCategory {

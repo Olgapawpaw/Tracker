@@ -20,11 +20,12 @@ final class TrackerSupplementaryView: UICollectionReusableView {
         ])
     }
     
-    func updateTitleLabel(text: String) {
-        titleLabel.text = text
-    }
-    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Public Methods
+    func updateTitleLabel(text: String) {
+        titleLabel.text = text
     }
 }

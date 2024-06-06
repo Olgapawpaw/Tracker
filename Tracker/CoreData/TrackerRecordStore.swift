@@ -36,10 +36,51 @@ final class TrackerRecordStore: NSObject {
         }
     }
     
+    func checkExistTrackerRecordAllTrackers() -> Bool {
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.resultType = .countResultType
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            if result.finalResult?[0] as! Int > 0 {
+                return true
+            } else {
+                return false
+            }
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Bool()
+        }
+    }
+    
     func countTrackerRecord(_ trackerRecord: TrackerRecord) -> Int {
         let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
         request.resultType = .countResultType
         request.predicate = NSPredicate(format: "id == %@", trackerRecord.id as CVarArg)
+        do {
+            let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
+            return result.finalResult?[0] as! Int
+        } catch let error as NSError {
+            print(error.userInfo)
+            return Int()
+        }
+    }
+    
+    func getCompletedTrackersForToday(day: Date) throws -> [TrackerRecordCoreData] {
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.returnsObjectsAsFaults = false
+        request.predicate = NSPredicate(format: "date == %@", day as CVarArg)
+        do {
+            let result = try context.fetch(request)
+            return result
+        } catch let error as NSError {
+            print(error.userInfo)
+            return []
+        }
+    }
+    
+    func countTrackerRecordAllTrackers() -> Int {
+        let request = NSFetchRequest<TrackerRecordCoreData>(entityName: "TrackerRecordCoreData")
+        request.resultType = .countResultType
         do {
             let result = try context.execute(request) as! NSAsynchronousFetchResult<NSFetchRequestResult>
             return result.finalResult?[0] as! Int

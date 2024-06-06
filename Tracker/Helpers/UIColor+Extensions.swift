@@ -1,11 +1,13 @@
 import UIKit
 
+
 extension UIColor {
     static var ypBlue: UIColor{UIColor(named: "YPBlue") ?? UIColor.blue}
     static var ypBlack: UIColor{UIColor(named: "YPBlack") ?? UIColor.black}
     static var ypLightGray: UIColor{UIColor(named: "YPLightGray") ?? UIColor.gray}
     static var ypGray: UIColor{UIColor(named: "YPGrey") ?? UIColor.gray}
     static var ypRed: UIColor{UIColor(named: "YPRed") ?? UIColor.gray}
+    static var ypWhite: UIColor{UIColor(named: "YPWhite") ?? UIColor.gray}
     static var colorSelection1: UIColor{UIColor(named: "ColorSelection1") ?? UIColor.gray}
     static var colorSelection2: UIColor{UIColor(named: "ColorSelection2") ?? UIColor.gray}
     static var colorSelection3: UIColor{UIColor(named: "ColorSelection3") ?? UIColor.gray}
@@ -24,5 +26,8 @@ extension UIColor {
     static var colorSelection16: UIColor{UIColor(named: "ColorSelection16") ?? UIColor.gray}
     static var colorSelection17: UIColor{UIColor(named: "ColorSelection17") ?? UIColor.gray}
     static var colorSelection18: UIColor{UIColor(named: "ColorSelection18") ?? UIColor.gray}
+    static var gradient1: UIColor{UIColor(named: "Gradient1") ?? UIColor.gray}
+    static var gradient2: UIColor{UIColor(named: "Gradient2") ?? UIColor.gray}
+    static var gradient3: UIColor{UIColor(named: "Gradient3") ?? UIColor.gray}
     static var viewBackgroundColor = UIColor.systemBackground
 }

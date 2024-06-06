@@ -42,6 +42,7 @@ final class NewHabitShedulerViewController: UIViewController {
     
     // MARK: - IB Actions
     @objc private func onClickReadyButton() {
+        //TODO можно добавить сортировку, чтобы сокращенные дни недели были по порядку
         delegate?.updateSheduler(sheduler: sheduler)
         delegate?.updateTable()
         self.dismiss(animated: true)
@@ -82,15 +83,6 @@ final class NewHabitShedulerViewController: UIViewController {
 
 // MARK: - UITableViewDelegate, UITableViewDataSource
 extension NewHabitShedulerViewController: UITableViewDelegate, UITableViewDataSource{
-    
-    @objc func switchChanged(_ sender : UISwitch!){
-        if sheduler.contains(weekDay[sender.tag]) {
-            sheduler.remove(at: sheduler.firstIndex(of: weekDay[sender.tag]) ?? 0)
-        } else {
-            sheduler.append(weekDay[sender.tag])
-        }
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return weekDayForView.count
     }
@@ -100,13 +92,11 @@ extension NewHabitShedulerViewController: UITableViewDelegate, UITableViewDataSo
         guard let cell = cell as? NewHabitShedulerTableViewCell else {
             return NewHabitShedulerTableViewCell()
         }
-        cell.buttonLabel.text = weekDayForView[indexPath.item]
-        cell.switchView.tag = indexPath.row
-        cell.switchView.addTarget(self,
-                                  action: #selector(self.switchChanged(_:)),
-                                  for: .valueChanged)
+        cell.delegete = self
+        cell.updateButtonLabel(text: weekDayForView[indexPath.item])
+        cell.switchViewTag(tag: indexPath.row)
         if sheduler.contains(weekDay[indexPath.item]) {
-            cell.switchView.isOn = true
+            cell.switchViewIsOn()
         }
         if indexPath.item == weekDayForView.count - 1 {
             cell.separatorInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: .greatestFiniteMagnitude)
@@ -116,5 +106,16 @@ extension NewHabitShedulerViewController: UITableViewDelegate, UITableViewDataSo
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 75
+    }
+}
+
+// MARK: - NewHabitShedulerTableViewCellDelegate
+extension NewHabitShedulerViewController: NewHabitShedulerTableViewCellDelegate{
+    func switchChanged(_ sender : UISwitch!) {
+        if sheduler.contains(weekDay[sender.tag]) {
+            sheduler.remove(at: sheduler.firstIndex(of: weekDay[sender.tag]) ?? 0)
+        } else {
+            sheduler.append(weekDay[sender.tag])
+        }
     }
 }
