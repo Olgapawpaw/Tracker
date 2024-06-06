@@ -15,7 +15,7 @@
 "emoji" = "Emoji";
 "color" = "Color";
 "cancel" = "Cancel";
-"cancelEntry" = "Cancellation";
+"cancelEntry" = "Cancel";
 "create" = "Create";
 "emptyCategory" = "Habits and events can be \n combined by meaning";
 "addCategory" = "Add a category";
@@ -49,9 +49,8 @@
 "emptyStatistics" = "Nothing to analyze yet";
 "bestPeriod" = "Best period";
 "perfectDay" = "Perfect days";
-"completedTrakers" = "Трекеров завершено";
 "averageValue" = "Average value";
-"pinCategory" = "Fixed";
+"pinCategory" = "Завершенные";
 "save" = "Save";
 "deleteTracker" = "Are you sure you want to delete the tracker?";
 "filter.allTrackers" = "All trackers";

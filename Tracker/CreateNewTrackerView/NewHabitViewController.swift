@@ -248,10 +248,9 @@ extension NewHabitViewController: UITableViewDelegate, UITableViewDataSource{
             if sheduler.isEmpty {
                 cell.updateTitleLabelText(text: namesCell[indexPath.item])
             } else {
-                switch sheduler {
-                case WeekDay.allCases:
+                if sheduler.contains(WeekDay.monday) && sheduler.contains(WeekDay.thursday) && sheduler.contains(WeekDay.wednesday) && sheduler.contains(WeekDay.tuesday) && sheduler.contains(WeekDay.friday) && sheduler.contains(WeekDay.saturday) && sheduler.contains(WeekDay.sunday) {
                     cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: everyDay))
-                default:
+                } else {
                     cell.updateTitleLabelAttributedText(attribut: createAtributedText(cell: cell, indexPath: indexPath, text: createStrWeekDayShortName()))
                 }
             }

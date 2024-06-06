@@ -127,8 +127,9 @@ final class TabBarController: UITabBarController, UISearchBarDelegate, UITabBarC
         search.searchBar.placeholder = searchText
         search.searchResultsUpdater = self
         search.hidesNavigationBarDuringPresentation = false
+        search.navigationItem.hidesSearchBarWhenScrolling = false
+        search.obscuresBackgroundDuringPresentation = true
         search.searchBar.setValue(cancelEntry, forKey: "cancelButtonText")
-        //search
         return search
     }
     

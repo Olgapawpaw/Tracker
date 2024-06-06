@@ -42,6 +42,7 @@ final class NewHabitShedulerViewController: UIViewController {
     
     // MARK: - IB Actions
     @objc private func onClickReadyButton() {
+        //TODO можно добавить сортировку, чтобы сокращенные дни недели были по порядку
         delegate?.updateSheduler(sheduler: sheduler)
         delegate?.updateTable()
         self.dismiss(animated: true)

@@ -44,7 +44,7 @@ final class TrackerCategoryStore: NSObject {
     
     // MARK: - Public Methods
     func getTrackerCategory(trackerCoreData: [TrackerCoreData]) -> [TrackerCategory] {
-        //потом надо будете через запрос к бд сделать
+        //TODO можно переделать через запросы к БД чтобы не так жутко выглядело
         var nameCategory = [String]()
         var trackerCategory = [TrackerCategory]()
         var trackers = [Tracker]()
